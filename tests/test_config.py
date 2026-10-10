@@ -66,6 +66,11 @@ class BringupConfig(unittest.TestCase):
         self.assertGreaterEqual(self.cfg["event"]["sleep_state"]["subs"] + 2,
                                 2 * peripherals)
 
+    def test_led_subscriber_capacity(self):
+        # Feature defaults add 1 layer and 2 connection subscribers.
+        self.assertGreaterEqual(self.cfg["event"]["layer_change"]["subs"] + 1, 3)
+        self.assertGreaterEqual(self.cfg["event"]["connection_status_change"]["subs"] + 2, 4)
+
     def test_madula_tap_hold_and_buttons(self):
         layers = [layer["keys"].split() for layer in self.cfg["keymap"]["layer"]]
         self.assertEqual(layers[0][12], "LT(3,Escape)")

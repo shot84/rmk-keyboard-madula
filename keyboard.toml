@@ -96,6 +96,12 @@ split_peripherals_num = 2
 [event.sleep_state]
 subs = 2
 
+# LED monitor in addition to both split peripheral managers.
+[event.layer_change]
+subs = 2
+[event.connection_status_change]
+subs = 2
+
 [split]
 connection = "ble"
 

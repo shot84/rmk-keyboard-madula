@@ -3,13 +3,13 @@
 use rmk::macros::rmk_central;
 #[cfg(feature = "lpps")]
 mod lpps;
+mod status_led;
 #[rmk_central]
 mod keyboard_central {
     // RMK 0.9 initializes registered processors before keymap. Construct this
     // keymap-dependent processor at entry instead; retain all default tasks.
     #[Override(entry)]
     fn run() {
-        use rmk::core_traits::Runnable;
         let mut pointer = rmk::input_device::pointing::PointingProcessor::new(
             &keymap,
             rmk::input_device::pointing::PointingProcessorConfig {
@@ -34,6 +34,21 @@ mod keyboard_central {
     #[Override(usb)]
     fn init_usb() {
         spawner.spawn(crate::runtime_status().unwrap());
+        {
+            use embassy_nrf::gpio::{Output, Level, OutputDrive};
+            let mut config = embassy_nrf::spim::Config::default();
+            config.frequency = embassy_nrf::spim::Frequency::M4;
+            let spi = embassy_nrf::spim::Spim::new_txonly_nosck(
+                p.SPI3, crate::status_led::Irqs, p.P0_28, config,
+            );
+            spawner.spawn(crate::status_led::run(
+                spi,
+                Output::new(p.P0_03, Level::High, OutputDrive::Standard),
+                Output::new(p.P0_26, Level::High, OutputDrive::Standard),
+                Output::new(p.P0_30, Level::High, OutputDrive::Standard),
+                Output::new(p.P0_06, Level::High, OutputDrive::Standard),
+            ).unwrap());
+        }
         #[cfg(feature = "lpps")]
         {
             let mut config = embassy_nrf::spim::Config::default();
