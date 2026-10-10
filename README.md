@@ -43,6 +43,18 @@ BLE splitの接続確認には3台ともRMK版が必要です。ZMKの左右と�
 
 ## USB CDC Debug
 
+### LPPS診断（開発ブランチ）
+
+`bash scripts/build-docker.sh --bin madula-central --features lpps`で
+ADS1220診断タスクを有効化できます。通常ビルドでは無効です。
+Madula/ZMKのSCK=P1.15、MISO=P1.13、MOSI=P1.12、SPI mode 1・1MHzを使用。
+設定照合後に100組を平均し、約1秒ごとにX/Y生値をCDCへ表示します。
+この診断版はカーソルを動かしません。デッドゾーン・方向補正・ポインター出力は未実装です。
+2026-10-10: Centralへ書き込み、レジスター応答`ff ff ff ff`を確認。
+期待値`05 80 43 a0`と一致しないため読み取りを停止・5秒後に再試行します。
+通信未確認であり、LPPS動作完了ではありません。接続先・装着状態の確認待ちです。
+設定の参照元は`te9no/ads1220-zephyr-module`とCornixの`madula-trackpoint`です。
+
 RMK 0.9.0標準の`usb_log`で、Madula CentralはUSB HIDとCDCを共存させ、
 Cornix左右はそれぞれUSB CDCでローカルのRMKログを出す構成です。
 RMKの`defmt`機能とは排他のため、RMKログは`log`経由に切り替えています。

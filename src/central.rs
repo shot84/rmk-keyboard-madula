@@ -1,11 +1,23 @@
 #![no_main]
 #![no_std]
 use rmk::macros::rmk_central;
+#[cfg(feature = "lpps")]
+mod lpps;
 #[rmk_central]
 mod keyboard_central {
     #[Override(usb)]
     fn init_usb() {
         spawner.spawn(crate::runtime_status().unwrap());
+        #[cfg(feature = "lpps")]
+        {
+            let mut config = embassy_nrf::spim::Config::default();
+            config.frequency = embassy_nrf::spim::Frequency::M1;
+            config.mode = embassy_nrf::spim::MODE_1;
+            let spi = embassy_nrf::spim::Spim::new(
+                p.TWISPI0, crate::lpps::Irqs, p.P1_15, p.P1_13, p.P1_12, config,
+            );
+            spawner.spawn(crate::lpps::run(spi).unwrap());
+        }
         #[cfg(feature = "boot-audit")]
         {
             spawner.spawn(crate::boot_recovery().unwrap());
