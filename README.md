@@ -173,6 +173,17 @@ CDCは仮想シリアルで、指定baudはUART通信速度を設定するもの
 
 ## ビルド
 
+### GitHub Releasesでの配布
+
+`.github/workflows/release.yml`はCornix左右・Madula LPPS・Madula TBを個別にビルドします。
+Actionsから手動実行すると成果物のみ作成し、`v`で始まるタグをpushすると全4ビルド成功後に
+Releaseの**下書き・プレリリース**を作成します。確認後にGitHubでPublishすると、
+[Releases](https://github.com/te9no/rmk-keyboard-madula/releases)から誰でもUF2をダウンロードできます。
+自動で一般公開はしません。IQS・起動診断版・個体バックアップは配布対象外です。
+成果物はUF2、ELF、ビルド元コミット・ハッシュを含むJSON、SHA256SUMSです。
+Rust 1.94.1とCargo.lockを指定し、CIではARM GCCとlibclangをインストールします。
+初回のGitHub Actions実行は未検証です。移行時の注意は[リリース説明](docs/release-notes.md)を参照してください。
+
 ### キーマップの参照元
 
 [te9no/zmk-keyboard-cornix の config/madula.keymap](https://github.com/te9no/zmk-keyboard-cornix/blob/1ca91122e8f91f773ecee9fe97af8f6f1aacd329/config/madula.keymap)
