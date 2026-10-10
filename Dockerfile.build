@@ -1,0 +1,5 @@
+FROM zmk-workspace-dev:latest
+USER root
+RUN apt-get update -qq && apt-get install -y --no-install-recommends libclang-dev
+ENV CC_thumbv7em_none_eabihf=/opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc
+ENV AR_thumbv7em_none_eabihf=/opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/bin/arm-zephyr-eabi-ar
