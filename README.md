@@ -10,11 +10,21 @@ Cornix左右＋MadulaをRMK化する独立した実験用リポジトリ。
 RMKのGATTサーバー生成でpanicしたことが原因でした。`Madula RMK`へ短縮済みです。
 panicをRAMへ保存して読み出した実機ログで特定しました。
 以下の調査履歴にある保存処理・起動順序の疑いは原因確定前の仮説です。
-Cornix左右との接続、キー入力、ポインティング、長時間動作は未確認です。
+Cornix左右へRMKを書き込み、各CDCとCentralへのBLE接続を確認しました。
+左のキーイベントがCentralへ届くこともログで確認済みです。
+左右の基本入力はユーザー確認済みです。全キー・ポインティング・長時間動作は未確認です。
 修正後の通常版から1200 baudリセット→UF2ドライブ→同じ通常版の再書き込み→
 COM復帰も実機確認済みです。現在XIAOにはこの通常版が入っています。
 CDCで`Start scanning peripherals`と10秒・20秒の稼働ログ
 （`storage=enabled`, `boot_audit=false`）も確認済みです。
+
+左右同時接続時には別の再起動問題が発生しました。
+RMK 0.9のスリープ通知はBLE接続管理とPeripheralManagerが各1枠を使うため、
+2台で4枠必要ですが、display無効時の生成値は3枠でした。
+`[event.sleep_state] subs = 2`を指定し、機能別追加分と合わせて4枠を確保しています。
+回帰テストを追加し、通常版をCentralへ再書き込みしました。
+左右の接続ログとCentralの連続稼働1510秒（約25分）を確認しました（長時間試験は未完了）。
+クラッシュ保存の再試行では本文が空だったため、panic位置そのものは未採取です。
 
 - Madula: nRF52840 Central、直接接続の3キー、USB/BLEホスト接続
 - Cornix左・右: nRF52840 BLE Peripheral、各4×7マトリクス
@@ -23,7 +33,7 @@ CDCで`Start scanning peripherals`と10秒・20秒の稼働ログ
 - LayoutShift、BTプロファイル操作は未移植。その位置は誤操作防止のためNoに設定
 - TB(PMW3610)、LPPS(ADS1220)、IQS9151、左右エンコーダ、LED、電圧監視は未実装
 - DYA StudioはZMK用のため、この版では利用できません。Vial等の編集対応も未実装
-- 3台ともUSB CDC ACM Debugログ・1200 baud bootを実装（RMK一式の実機動作は未確認）
+- 3台ともUSB CDC ACM Debugログ・1200 baud bootを実装し、実機でリセット・再書き込み・COM復帰を確認済み
 
 RMK 0.9.0を固定し、依存解決はCargo.lockで固定します。
 参考: [RMK split](https://rmk.rs/main/docs/features/split_keyboard)、
@@ -48,7 +58,8 @@ CDCは仮想シリアルで、指定baudはUART通信速度を設定するもの
 - 入力イベントがログに含まれ得るため、パスワード入力中の収集やログの無確認公開は避けてください。
 - 1200 baudでDTRを500 ms以上有効にしてから落とすと、Adafruitブートローダーへリセットします。
 - CDCコマンド、DYA Studio接続は提供しません。
-- XIAO CentralのCOM/HID列挙と再書き込み後の復帰は確認済み。左右PeripheralとBLE通信は未検証です。
+- XIAO CentralのCOM/HID列挙と再書き込み後の復帰、左右PeripheralのCDCとBLE接続は確認済みです。
+- 2026-10-10: 左COM77、右COM78を順に1200 baudリセットし、CornixのUF2ブートローダーを確認。各CURRENT.UF2をローカルにバックアップして再書き込みし、同じCOMへの復帰とCentralへのBLE再接続を確認しました。Centralはリセットせず稼働を継続しました。COM番号は環境依存です。
 - Centralは10秒ごとに稼働秒数を出力します。これは実行タスクの生存確認であり、左右接続成功を意味しません。
 
 参考: [RMK USB Logging](https://rmk.rs/v0.7.8/guide/features/usb_logging)、

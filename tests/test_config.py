@@ -47,6 +47,12 @@ class BringupConfig(unittest.TestCase):
         # RMK 0.9's BLE profile naming reserves space: max 22 UTF-8 bytes.
         self.assertLessEqual(len(self.cfg["keyboard"]["product_name"].encode("utf-8")), 22)
 
+    def test_split_sleep_subscriber_capacity(self):
+        # Pinned RMK 0.9 adds two split+BLE subscribers to the configured base.
+        peripherals = len(self.cfg["split"]["peripheral"])
+        self.assertGreaterEqual(self.cfg["event"]["sleep_state"]["subs"] + 2,
+                                2 * peripherals)
+
     def test_madula_tap_hold_and_buttons(self):
         layers = [layer["keys"].split() for layer in self.cfg["keymap"]["layer"]]
         self.assertEqual(layers[0][12], "LT(3,Escape)")

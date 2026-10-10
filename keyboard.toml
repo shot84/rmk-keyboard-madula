@@ -85,6 +85,12 @@ enabled = true
 [rmk]
 split_peripherals_num = 2
 
+# RMK 0.9: each BLE link and PeripheralManager subscribes to sleep state.
+# Two peripherals need four slots, including when display is disabled.
+# The feature defaults add two slots; reserve the other two here.
+[event.sleep_state]
+subs = 2
+
 [split]
 connection = "ble"
 
