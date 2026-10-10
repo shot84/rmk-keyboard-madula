@@ -54,6 +54,18 @@ BLE splitの接続確認には3台ともRMK版が必要です。ZMKの左右と�
 
 ## USB CDC Debug
 
+### 電圧監視の診断（開発ブランチ）
+
+`bash scripts/build-docker.sh --bin madula-central --features lpps,battery-audit`
+でLPPSと独立したSAADC診断を有効化します。Madulaの既存ZMK設定に合わせて
+A0/P0.02を読み、12bit・内部0.6V基準・gain 1/6・16倍oversampling・40us取得時間を使用。
+10秒ごとにADC生値とピン電圧をCDCへ出します。校正・測定は非同期で1秒のタイムアウト付き。
+電池の種類と換算倍率が未確認のため、残量%・充電判定・電池用LED表示は実装しません。
+2026-10-10: 診断版のビルドと既存設定テスト12件成功。接続中のMadulaへCDC経由で
+バックアップ後に書き込み、COM79復帰とLPPSの測定継続を確認。
+A0はraw=2～3（約2～3mV）。電池未接続・計測経路などは未確認であり、電池残量0%とは扱いません。
+診断機能は既定ビルドでは無効です。
+
 ### LPPS診断（開発ブランチ）
 
 `bash scripts/build-docker.sh --bin madula-central --features lpps`で

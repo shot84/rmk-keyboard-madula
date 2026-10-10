@@ -4,6 +4,8 @@ use rmk::macros::rmk_central;
 #[cfg(feature = "lpps")]
 mod lpps;
 mod status_led;
+#[cfg(feature = "battery-audit")]
+mod battery_audit;
 #[rmk_central]
 mod keyboard_central {
     // RMK 0.9 initializes registered processors before keymap. Construct this
@@ -34,6 +36,17 @@ mod keyboard_central {
     #[Override(usb)]
     fn init_usb() {
         spawner.spawn(crate::runtime_status().unwrap());
+        #[cfg(feature = "battery-audit")]
+        {
+            let mut config = embassy_nrf::saadc::Config::default();
+            config.oversample = embassy_nrf::saadc::Oversample::Over16x;
+            let mut channel = embassy_nrf::saadc::ChannelConfig::single_ended(p.P0_02);
+            channel.time = embassy_nrf::saadc::Time::_40US;
+            let adc = embassy_nrf::saadc::Saadc::new(
+                p.SAADC, crate::battery_audit::Irqs, config, [channel],
+            );
+            spawner.spawn(crate::battery_audit::run(adc).unwrap());
+        }
         {
             use embassy_nrf::gpio::{Output, Level, OutputDrive};
             let mut config = embassy_nrf::spim::Config::default();
