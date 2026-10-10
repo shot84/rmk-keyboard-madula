@@ -56,6 +56,17 @@ BLE splitの接続確認には3台ともRMK版が必要です。ZMKの左右と�
 
 ### 電圧監視の診断（開発ブランチ）
 
+最新仕様（2026-10-10）: EasyEDAのGeaconPolaris → Bat → P1
+（page UUID `88e31726566844998c07abbfa788eb85`）のネットリストを読み取り確認。
+RL2=1MΩが昇圧前・QL8後の電池側ノードから`INPUT_VOLTAGE_B`へ、RL3=470kΩが
+同信号から`GND_B`へ接続。H5の3番が測定出力です。回路は変更していません。
+電池側電圧はADCピン電圧×1470/470で換算します。raw=483なら約1328mV。
+ユーザーの実機はNiMH 1本。CDCで`pin_mv`と`battery_mv`を10秒ごとに表示します。
+換算版を書き込み、CDCでraw=484 / pin_mv=425 / battery_mv=1330とLPPS測定継続を確認済み。
+残量%・充電判定・電池用LED表示は未実装。テスターとの精度照合も未実施です。
+`rustc +stable --test src/battery_voltage.rs -o target/battery-voltage-tests && target/battery-voltage-tests`
+で換算と範囲外入力の2テストを実行できます。以下は換算確定前の調査履歴です。
+
 `bash scripts/build-docker.sh --bin madula-central --features lpps,battery-audit`
 でLPPSと独立したSAADC診断を有効化します。Madulaの既存ZMK設定に合わせて
 A0/P0.02を読み、12bit・内部0.6V基準・gain 1/6・16倍oversampling・40us取得時間を使用。

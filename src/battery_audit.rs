@@ -1,5 +1,7 @@
 //! Read-only A0 voltage diagnostics. No battery percentage or charging claims.
-//! ZMK Madula vbatt uses AIN0 (P0.02), no enable GPIO, and a 1:1 scale.
+//! AIN0 (P0.02), no enable GPIO. External Bat board: RL2=1M, RL3=470k.
+#[path = "battery_voltage.rs"]
+mod voltage;
 use embassy_nrf::{bind_interrupts, saadc};
 use embassy_time::{with_timeout, Duration, Timer};
 
@@ -19,13 +21,13 @@ pub async fn run(mut adc: saadc::Saadc<'static, 1>) {
             return;
         }
         // Internal 0.6V reference, gain 1/6, 12-bit. Report the pin voltage,
-        // not a battery percentage: chemistry and scale need physical validation.
+        // Divider verified in EasyEDA GeaconPolaris/Bat. No percentage estimate.
         let raw = sample[0];
-        if !(0..4095).contains(&raw) {
-            log::warn!("Battery audit: A0 out of range raw={}; voltage invalid", raw);
-        } else {
-            let mv = (i32::from(raw) * 3600 + 2048) / 4096;
-            log::info!("Battery audit: A0 raw={} pin_mv={} scale_unverified=1:1", raw, mv);
+        match voltage::millivolts(raw) {
+            Some((pin, battery)) => log::info!(
+                "Battery: raw={} pin_mv={} battery_mv={} chemistry=NiMH cells=1 divider=1470/470",
+                raw, pin, battery),
+            None => log::warn!("Battery: A0 out of range raw={}; voltage invalid", raw),
         }
         Timer::after_secs(10).await;
     }
