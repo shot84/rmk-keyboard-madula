@@ -20,9 +20,11 @@ class BringupConfig(unittest.TestCase):
             self.assertFalse(used & region)
             used |= region
         mapped = re.findall(r"\((\d+),(\d+)\)", self.cfg["layout"]["map"])
-        self.assertEqual(len(mapped), 53)
-        self.assertEqual(len(set(mapped)), 53)
-        self.assertTrue({tuple(map(int, p)) for p in mapped} <= used)
+        virtual = {(4, c) for c in range(3, 10)}
+        self.assertFalse(virtual & used)
+        self.assertEqual(len(mapped), 60)
+        self.assertEqual(len(set(mapped)), 60)
+        self.assertTrue({tuple(map(int, p)) for p in mapped} <= used | virtual)
 
     def test_source_pin_mapping(self):
         left, right = self.cfg["split"]["peripheral"]
@@ -41,7 +43,10 @@ class BringupConfig(unittest.TestCase):
         self.assertEqual(self.cfg["keymap"]["layers"], 5)
         self.assertEqual(len(self.cfg["keymap"]["layer"]), 5)
         for layer in self.cfg["keymap"]["layer"]:
-            self.assertEqual(len(layer["keys"].split()), 53)
+            self.assertEqual(len(layer["keys"].split()), 60)
+            self.assertEqual(layer["keys"].split()[-7:], [
+                "MouseBtn1", "MouseBtn2", "MouseBtn3", "MouseWheelUp",
+                "MouseWheelDown", "MouseWheelLeft", "MouseWheelRight"])
 
     def test_ble_device_name_length(self):
         # RMK 0.9's BLE profile naming reserves space: max 22 UTF-8 bytes.
@@ -76,9 +81,9 @@ class BringupConfig(unittest.TestCase):
         self.assertEqual(layers[0][12], "LT(3,Escape)")
         self.assertEqual(layers[0][38:44], [
             "MT(Escape,LCtrl)", "LGui", "LAlt", "LT(1,Space)", "LT(2,Space)", "Backspace"])
-        self.assertEqual(layers[0][-3:], ["MouseBtn1", "MouseBtn3", "MouseBtn2"])
+        self.assertEqual(layers[0][50:53], ["MouseBtn1", "MouseBtn3", "MouseBtn2"])
         for layer in layers[1:]:
-            self.assertEqual(layer[-3:], ["_", "_", "_"])
+            self.assertEqual(layer[50:53], ["_", "_", "_"])
         for layer in layers:
             for key in layer:
                 match = re.match(r"(?:LT|MO)\((\d+)", key)

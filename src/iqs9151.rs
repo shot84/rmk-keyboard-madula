@@ -1,11 +1,11 @@
-//! IQS9151 single-finger pointer bring-up. No gesture emulation yet.
+//! IQS9151 pointer, tap and two-finger scroll input.
 //! Init sequence adapted from ShiniNet/zmk-driver-iqs9151 (MIT; see licenses).
 use embassy_nrf::{bind_interrupts, peripherals::TWISPI0, gpio::Input, twim::{self, Twim}};
 use embassy_time::{with_timeout, Duration, Instant, Timer};
-use rmk::event::{publish_event, Axis, AxisEvent, AxisValType, PointingEvent};
+use rmk::event::{publish_event, publish_event_async, KeyboardEvent, Axis, AxisEvent, AxisValType, PointingEvent};
 use crate::iqs9151_config::*;
-#[path = "iqs9151_frame.rs"]
-mod frame;
+#[path = "iqs9151_gestures.rs"]
+mod gestures;
 
 bind_interrupts!(pub struct Irqs { TWISPI0 => twim::InterruptHandler<TWISPI0>; });
 #[derive(Debug)]
@@ -98,13 +98,13 @@ impl Sensor {
         let info = self.word(0x1020).await?;
         log::info!("IQS9151 post-init info=0x{:04x}", info);
         if info & 0x80 != 0 { return Err(Error::Reset); }
-        log::info!("IQS9151 configured; single-finger pointer; gestures disabled");
+        log::info!("IQS9151 configured; half-speed pointer; 1/2/3-finger tap; 2-finger scroll");
         Ok(())
     }
-    async fn sample(&mut self) -> Result<(i16, i16, u8), Error> {
-        let mut frame = [0; 16];
+    async fn sample(&mut self) -> Result<gestures::Sample, Error> {
+        let mut frame = [0; 40];
         self.read(0x1014, &mut frame).await?;
-        frame::decode(&frame).ok_or(Error::Reset)
+        gestures::decode(&frame).ok_or(Error::Reset)
     }
 }
 
@@ -119,9 +119,24 @@ pub async fn run(bus: Twim<'static>, ready: Input<'static>) {
         }
         let mut report = Instant::now();
         let mut sum = [0i32; 2];
+        let mut gestures = gestures::Gestures::default();
         loop {
             match sensor.sample().await {
-                Ok((dx, dy, fingers)) => {
+                Ok(sample) => {
+                    let fingers = sample.fingers;
+                    let output = gestures.update(sample, Instant::now().as_millis());
+                    let [dx, dy] = output.pointer;
+                    if output.tap != 0 {
+                        log::info!("IQS9151 tap fingers={}", output.tap);
+                        tap_virtual(2 + output.tap).await;
+                    }
+                    for axis in 0..2 {
+                        let value = output.scroll[axis];
+                        // Positive sensor Y is downward; wheel-up is the opposite.
+                        let col = if axis == 0 { if value < 0 {8} else {9} }
+                                  else if value < 0 {6} else {7};
+                        for _ in 0..value.unsigned_abs() { tap_virtual(col).await; }
+                    }
                     if dx != 0 || dy != 0 {
                         publish_event(PointingEvent { device_id: 0, axes: [
                             AxisEvent { typ: AxisValType::Rel, axis: Axis::X, value: dx },
@@ -145,4 +160,12 @@ pub async fn run(bus: Twim<'static>, ready: Input<'static>) {
         }
         Timer::after_secs(2).await;
     }
+}
+
+async fn tap_virtual(col: u8) {
+    // Distinct virtual positions preserve physical Madula button bindings.
+    // Await both events: never drop a release on a full event queue.
+    publish_event_async(KeyboardEvent::key(4, col, true)).await;
+    Timer::after_millis(8).await;
+    publish_event_async(KeyboardEvent::key(4, col, false)).await;
 }

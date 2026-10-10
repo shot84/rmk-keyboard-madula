@@ -16,9 +16,17 @@ The system-control TP ATI request is encoded as LE16 bit 5. ALP calibration
 is not awaited during active-mode initialization; its sensing occurs in
 low-power modes. The default automatic re-ATI settings remain enabled.
 
-This first port implements single-finger relative motion only. Tap, multi-finger
-scroll, pinch and inertia are not implemented. Madula's three physical buttons
-retain their existing keymap. Streaming mode is used during bring-up.
+Single-finger motion is scaled by 1/2 with signed fractional remainders.
+One-, two-, and three-finger taps produce left, right, and middle clicks.
+Two-finger centroid motion produces horizontal/vertical wheel steps (32 coordinate
+units per step). A tap must finish within 250 ms and 40 units of accumulated
+centroid travel. Additional fingers must arrive within 100 ms. Finger-count
+transitions reset movement remainders and suppress one-finger cursor tails.
+Pinch, tap-drag and inertia are not implemented.
+
+Virtual matrix positions (4,3)..(4,9) carry the gestures through RMK's normal
+mouse-key handling on every layer. The 53 physical keys and three Madula button
+bindings are unchanged. Streaming mode is used during bring-up.
 
 CDC logs show product number, initialization errors, finger count and one-second
 motion totals. Each transfer and RDY wait is bounded; failure discards the frame
@@ -33,7 +41,11 @@ Bounded clock-stretched access recovers when RDY is inactive across MCU restarts
 and a 1 ms post-STOP delay separates communication windows.
 Reference: Azoteq IQS9150/IQS9151 datasheet sections 12.8–12.9 and Appendix A.12.
 
-Actual touch motion, directions and long-duration validation are pending.
+2026-10-10: user confirmed cursor motion, but reported excessive sensitivity.
+The subsequent half-speed and gesture implementation passed seven host unit
+tests and twelve configuration tests and built successfully. These new gestures
+have not yet been flashed or hardware-validated. Direction and long-duration
+validation remain pending.
 Before flashing, power off and fit the IQS
 module. Verify cold start, direction, finger release, USB/BLE and both Cornix
 peripherals. A successful compile is not evidence of hardware operation.
