@@ -12,7 +12,9 @@ Initialization data and sequence originate from ShiniNet/zmk-driver-iqs9151
 commit 08a6fd19c5aa5ae7f11daf371b5a391cd8596783 (MIT, retained under licenses/).
 Settings originally supplied by Azoteq. Madula's ZMK rotation (270 degrees
 counterclockwise), resolution and dynamic filter overrides are applied on-chip.
-The system-control ATI request is encoded as LE16 bits 5 and 6.
+The system-control TP ATI request is encoded as LE16 bit 5. ALP calibration
+is not awaited during active-mode initialization; its sensing occurs in
+low-power modes. The default automatic re-ATI settings remain enabled.
 
 This first port implements single-finger relative motion only. Tap, multi-finger
 scroll, pinch and inertia are not implemented. Madula's three physical buttons
@@ -22,6 +24,16 @@ CDC logs show product number, initialization errors, finger count and one-second
 motion totals. Each transfer and RDY wait is bounded; failure discards the frame
 and retries initialization without intentionally resetting the keyboard.
 
-Hardware validation is pending. Before flashing, power off and fit the IQS
+2026-10-10: flashed through COM79's 1200-baud reset. Product 0x09bc was read.
+The first version failed ATI initialization; the subsequent revision reached
+configuration but retained Show Reset after bulk defaults. The current revision
+acknowledges reset after configuration, verifies the flag, and produced 12 seconds
+of continuous no-touch frames (zero deltas) with no initialization errors.
+Bounded clock-stretched access recovers when RDY is inactive across MCU restarts,
+and a 1 ms post-STOP delay separates communication windows.
+Reference: Azoteq IQS9150/IQS9151 datasheet sections 12.8–12.9 and Appendix A.12.
+
+Actual touch motion, directions and long-duration validation are pending.
+Before flashing, power off and fit the IQS
 module. Verify cold start, direction, finger release, USB/BLE and both Cornix
 peripherals. A successful compile is not evidence of hardware operation.

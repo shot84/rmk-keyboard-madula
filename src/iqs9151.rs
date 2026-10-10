@@ -14,13 +14,17 @@ enum Error { ReadyTimeout, TransferTimeout, Bus(twim::Error), Product(u16), Rese
 struct Sensor { bus: Twim<'static>, ready: Input<'static> }
 impl Sensor {
     async fn ready(&mut self) -> Result<(), Error> {
-        with_timeout(Duration::from_millis(500), self.ready.wait_for_low()).await
-            .map_err(|_| Error::ReadyTimeout)
+        // Default Force Comms Method=0 allows a bounded clock-stretched access
+        // if firmware restarts while the sensor remains in event/low-power mode.
+        let _ = with_timeout(Duration::from_millis(100), self.ready.wait_for_low()).await;
+        Ok(())
     }
     async fn read(&mut self, reg: u16, data: &mut [u8]) -> Result<(), Error> {
         self.ready().await?;
-        with_timeout(Duration::from_millis(100), self.bus.write_read(0x56, &reg.to_le_bytes(), data))
-            .await.map_err(|_| Error::TransferTimeout)?.map_err(Error::Bus)
+        let result = with_timeout(Duration::from_millis(500), self.bus.write_read(0x56, &reg.to_le_bytes(), data))
+            .await.map_err(|_| Error::TransferTimeout)?.map_err(Error::Bus);
+        Timer::after_millis(1).await;
+        result
     }
     async fn word(&mut self, reg: u16) -> Result<u16, Error> {
         let mut data = [0; 2]; self.read(reg, &mut data).await?;
@@ -32,8 +36,9 @@ impl Sensor {
             let mut tx = [0; 32];
             tx[..2].copy_from_slice(&(reg + (index * 30) as u16).to_le_bytes());
             tx[2..2 + chunk.len()].copy_from_slice(chunk);
-            with_timeout(Duration::from_millis(100), self.bus.write(0x56, &tx[..2 + chunk.len()]))
+            with_timeout(Duration::from_millis(500), self.bus.write(0x56, &tx[..2 + chunk.len()]))
                 .await.map_err(|_| Error::TransferTimeout)?.map_err(Error::Bus)?;
+            Timer::after_millis(1).await;
         }
         Ok(())
     }
@@ -55,6 +60,7 @@ impl Sensor {
         let ctrl = self.word(0x11bc).await?;
         self.set(0x11bc, ctrl | 0x80).await?;
         Timer::after_millis(100).await;
+        log::info!("IQS9151 reset acknowledged");
         for (reg, data) in [(0x115c, ALP_COMPENSATION), (0x1178, MAIN_CONFIG),
                             (0x1218, RXTX_MAP), (0x1246, CHANNEL_DISABLE), (0x129e, SNAP_ENABLE)] {
             self.write(reg, data).await?;
@@ -67,18 +73,31 @@ impl Sensor {
             self.set(reg, val).await?;
         }
         self.write(0x11ee, &[80]).await?;
-        // System control is LE16: ATI request bits 5 and 6 belong to the low byte.
-        self.set(0x11bc, 0x60).await?;
+        log::info!("IQS9151 configuration written; starting TP ATI");
+        // TP is sensed in active mode. ALP is only sensed in low-power modes;
+        // waiting for its queued request here can block an otherwise ready TP.
+        self.set(0x11bc, 0x20).await?;
         let start = Instant::now();
         loop {
-            if self.word(0x11bc).await? & 0x60 == 0 { break; }
-            if start.elapsed().as_millis() > 3000 { return Err(Error::AtiTimeout); }
+            let ctrl = self.word(0x11bc).await?;
+            if ctrl & 0x20 == 0 { break; }
+            if start.elapsed().as_millis() > 3000 {
+                let info = self.word(0x1020).await?;
+                log::warn!("IQS9151 ATI pending ctrl=0x{:04x} info=0x{:04x}", ctrl, info);
+                return Err(Error::AtiTimeout);
+            }
             Timer::after_millis(10).await;
         }
         // Keep streaming mode for bring-up: read one frame per RDY window.
         // Idle event-mode silence must not be treated as a failure.
         let settings = self.word(0x11be).await?;
         self.set(0x11be, settings & !0x100).await?;
+        // Bulk defaults include SYSTEM_CONTROL=0. Acknowledge once after all
+        // configuration writes, then verify; runtime resets still force reinit.
+        self.set(0x11bc, 0x80).await?;
+        let info = self.word(0x1020).await?;
+        log::info!("IQS9151 post-init info=0x{:04x}", info);
+        if info & 0x80 != 0 { return Err(Error::Reset); }
         log::info!("IQS9151 configured; single-finger pointer; gestures disabled");
         Ok(())
     }
