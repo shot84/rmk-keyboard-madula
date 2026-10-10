@@ -19,23 +19,56 @@ map = """
 """
 
 [keymap]
-layers = 2
+layers = 5
+# Source: te9no/zmk-keyboard-cornix config/madula.keymap @ 1ca9112
+# Layer order: base, func, num, bt, navi.
 
 [[keymap.layer]]
 keys = """
 Tab Q W E R T                    Y U I O P Backspace
-Escape A S D F G                 H J K L Backslash Enter
+LT(3,Escape) A S D F G            H J K L Backslash Enter
 LShift Z X C V B No No            N M Comma Dot Up Slash
-LCtrl LGui LAlt MO(1) Space Backspace Language1 Language2 No Left Down Right
+MT(Escape,LCtrl) LGui LAlt LT(1,Space) LT(2,Space) Backspace Language1 Language2 No Left Down Right
 MouseBtn1 MouseBtn3 MouseBtn2
 """
 
 [[keymap.layer]]
 keys = """
-Grave F1 F2 F3 F4 F5             F6 F7 F8 F9 F10 F11
-_ _ _ _ _ _                     _ _ _ _ _ F12
-_ _ _ _ _ _ _ _                 _ _ _ _ _ _
-_ _ _ _ _ _                     _ _ _ _ _ _
+_ PageUp Up PageDown _ _         F1 F2 F3 F4 F5 _
+_ Left Down Right _ _            F6 F7 F8 F9 F10 _
+_ Backspace Delete Home End _ _ _ F11 F12 Semicolon Quote _ _
+No No No _ _ Backspace           _ _ _ No No No
+_ _ _
+"""
+
+[[keymap.layer]]
+# BT clear and LayoutShift are intentionally inactive until ported.
+keys = """
+No Kc1 Kc2 Kc3 Kc4 Kc5           Kc6 Kc7 Kc8 Kc9 Kc0 _
+No _ _ _ _ _                    Minus Equal LeftBracket RightBracket Backslash _
+_ Backspace Delete _ _ _ _ _     _ Slash Semicolon Quote _ _
+No No No Enter No No            No No _ No No No
+_ _ _
+"""
+
+[[keymap.layer]]
+# ZMK BT_SEL / BT_CLR_ALL are not mapped to RMK host profiles yet.
+keys = """
+No No No No _ _                 _ _ _ _ _ _
+No _ _ _ _ _                    _ _ _ _ _ _
+No No No No No _ No _           _ _ _ _ _ _
+No No No _ _ _                  No No _ No No No
+_ _ _
+"""
+
+[[keymap.layer]]
+# Preserve source navi layout; source MO(7) targets a nonexistent layer.
+# Mouse directions preserved, speed is RMK's rather than ZMK's numeric values.
+keys = """
+No No No MouseUp PageUp PageDown MouseBtn1 MouseBtn3 MouseBtn2 MouseWheelUp MouseWheelDown No
+No No MouseLeft MouseDown MouseRight MouseWheelUp Left Down Up Right No No
+No No No No No MouseWheelDown _ _ _ _ No No No No
+No No No No _ _                 No No Kc5 No No No
 _ _ _
 """
 

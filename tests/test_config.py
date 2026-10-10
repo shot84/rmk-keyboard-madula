@@ -38,8 +38,24 @@ class BringupConfig(unittest.TestCase):
         self.assertTrue(direct["direct_pin_low_active"])
 
     def test_keymap_count(self):
+        self.assertEqual(self.cfg["keymap"]["layers"], 5)
+        self.assertEqual(len(self.cfg["keymap"]["layer"]), 5)
         for layer in self.cfg["keymap"]["layer"]:
             self.assertEqual(len(layer["keys"].split()), 53)
+
+    def test_madula_tap_hold_and_buttons(self):
+        layers = [layer["keys"].split() for layer in self.cfg["keymap"]["layer"]]
+        self.assertEqual(layers[0][12], "LT(3,Escape)")
+        self.assertEqual(layers[0][38:44], [
+            "MT(Escape,LCtrl)", "LGui", "LAlt", "LT(1,Space)", "LT(2,Space)", "Backspace"])
+        self.assertEqual(layers[0][-3:], ["MouseBtn1", "MouseBtn3", "MouseBtn2"])
+        for layer in layers[1:]:
+            self.assertEqual(layer[-3:], ["_", "_", "_"])
+        for layer in layers:
+            for key in layer:
+                match = re.match(r"(?:LT|MO)\((\d+)", key)
+                if match:
+                    self.assertLess(int(match[1]), len(layers))
 
     def test_flash_boundaries(self):
         # These conservative boundaries do NOT certify the installed bootloader.
@@ -47,6 +63,16 @@ class BringupConfig(unittest.TestCase):
         storage = self.cfg["storage"]
         self.assertGreaterEqual(storage["start_addr"], 0xD4000)
         self.assertLessEqual(storage["start_addr"] + storage["num_sectors"] * 4096, 0xF4000)
+
+    def test_usb_debug_features(self):
+        manifest = tomllib.loads((ROOT / "Cargo.toml").read_text())
+        rmk = manifest["dependencies"]["rmk"]
+        self.assertFalse(rmk["default-features"])
+        self.assertIn("usb_log", rmk["features"])
+        self.assertNotIn("defmt", rmk["features"])
+        self.assertIn("release_max_level_debug", manifest["dependencies"]["log"]["features"])
+        self.assertEqual({binary["name"] for binary in manifest["bin"]},
+                         {"madula-central", "cornix-left", "cornix-right"})
 
 
 if __name__ == "__main__":
