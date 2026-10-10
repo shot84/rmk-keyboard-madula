@@ -59,7 +59,7 @@ class BringupConfig(unittest.TestCase):
         self.assertNotIn(encoder["pin_a"], matrix_pins)
         self.assertNotIn(encoder["pin_b"], matrix_pins)
         for layer in self.cfg["keymap"]["layer"]:
-            self.assertEqual(layer["encoders"], [["MouseWheelDown", "MouseWheelUp"]])
+            self.assertEqual(layer["encoders"], [["MouseWheelUp", "MouseWheelDown"]])
 
     def test_split_sleep_subscriber_capacity(self):
         # Pinned RMK 0.9 adds two split+BLE subscribers to the configured base.

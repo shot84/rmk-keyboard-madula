@@ -24,7 +24,7 @@ layers = 5
 # Layer order: base, func, num, bt, navi.
 
 [[keymap.layer]]
-encoders = [["MouseWheelDown", "MouseWheelUp"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 Tab Q W E R T                    Y U I O P Backspace
 LT(3,Escape) A S D F G            H J K L Backslash Enter
@@ -34,7 +34,7 @@ MouseBtn1 MouseBtn3 MouseBtn2
 """
 
 [[keymap.layer]]
-encoders = [["MouseWheelDown", "MouseWheelUp"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 _ PageUp Up PageDown _ _         F1 F2 F3 F4 F5 _
 _ Left Down Right _ _            F6 F7 F8 F9 F10 _
@@ -45,7 +45,7 @@ _ _ _
 
 [[keymap.layer]]
 # BT clear and LayoutShift are intentionally inactive until ported.
-encoders = [["MouseWheelDown", "MouseWheelUp"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 No Kc1 Kc2 Kc3 Kc4 Kc5           Kc6 Kc7 Kc8 Kc9 Kc0 _
 No _ _ _ _ _                    Minus Equal LeftBracket RightBracket Backslash _
@@ -56,7 +56,7 @@ _ _ _
 
 [[keymap.layer]]
 # ZMK BT_SEL / BT_CLR_ALL are not mapped to RMK host profiles yet.
-encoders = [["MouseWheelDown", "MouseWheelUp"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 No No No No _ _                 _ _ _ _ _ _
 No _ _ _ _ _                    _ _ _ _ _ _
@@ -67,7 +67,7 @@ _ _ _
 
 [[keymap.layer]]
 # Preserve source navi layout; source MO(7) targets a nonexistent layer.
-encoders = [["MouseWheelDown", "MouseWheelUp"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"]]
 # Mouse directions preserved, speed is RMK's rather than ZMK's numeric values.
 keys = """
 No No No MouseUp PageUp PageDown MouseBtn1 MouseBtn3 MouseBtn2 MouseWheelUp MouseWheelDown No
