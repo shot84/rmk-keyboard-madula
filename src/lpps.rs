@@ -8,9 +8,13 @@ bind_interrupts!(pub struct Irqs {
 });
 
 async fn registers(spi: &mut spim::Spim<'static>) -> Result<[u8; 4], spim::Error> {
-    let mut rx = [0; 5];
-    spi.transfer(&mut rx, &[0x23, 0, 0, 0, 0]).await?;
-    Ok([rx[1], rx[2], rx[3], rx[4]])
+    let mut result = [0; 4];
+    for address in 0..4u8 {
+        let mut rx = [0; 2];
+        spi.transfer(&mut rx, &[0x20 | (address << 2), 0]).await?;
+        result[address as usize] = rx[1];
+    }
+    Ok(result)
 }
 
 async fn sample(spi: &mut spim::Spim<'static>, mux: u8) -> Result<i32, spim::Error> {
@@ -29,11 +33,16 @@ pub async fn run(mut spi: spim::Spim<'static>) {
     Timer::after_secs(3).await;
     loop {
         let result = async {
-            spi.write(&[0x06]).await?;
+            let mut reset_rx = [0; 1];
+            spi.transfer(&mut reset_rx, &[0x06]).await?;
             Timer::after_millis(2).await;
+            log::info!("LPPS reset registers={:02x?} (expected all zero)", registers(&mut spi).await?);
             // Gain 4, PGA bypass, 330 SPS single shot, REFP0, IDAC 100uA to REFP0.
             let expected = [0x05, 0x80, 0x43, 0xa0];
-            spi.write(&[0x43, expected[0], expected[1], expected[2], expected[3]]).await?;
+            for address in 0..4u8 {
+                let mut rx = [0; 2];
+                spi.transfer(&mut rx, &[0x40 | (address << 2), expected[address as usize]]).await?;
+            }
             Timer::after_millis(10).await;
             let actual = registers(&mut spi).await?;
             log::info!("LPPS registers={:02x?}; expected={:02x?}", actual, expected);
