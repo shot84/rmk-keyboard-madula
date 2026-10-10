@@ -54,6 +54,19 @@ BLE splitの接続確認には3台ともRMK版が必要です。ZMKの左右と�
 
 ## USB CDC Debug
 
+### PMW3610（開発ブランチ）
+
+`bash scripts/build-docker.sh --bin madula-central --features pmw3610,battery-audit`
+でTB版をビルドします。`lpps`との同時指定は禁止（共有ピンの競合）です。
+SCK=P1.13、SDIO=P1.15、CS=P1.12、IRQ=P1.14。GPIOによる3-wire mode 3で、
+SDIOを読み出し前に入力へ解放。ZMKで実証した個別レジスター読み出しを採用し、burstは使いません。
+800 CPI・force awake、PointingProcessorでXY入れ替え＋両軸反転。LED・電圧監視を維持。
+初期化手順はRMK 0.9 PMW3610実装、通信タイミングはte9no/zmk-driver-spi-three-wireを参照。
+CDCへID・初期化結果・約1秒ごとの移動量合計を出力。ID不一致時は移動を破棄し再初期化します。
+2026-10-10: TB版ビルド・既存設定テスト12件成功。Madulaへバックアップ後に書き込み、
+CDCでID=0x3eの継続応答と移動量[73,114]を確認。方向・操作感・長時間動作はユーザー確認待ち。
+同時点の電池入力は約5mV換算で推定残量はUnavailable（LED残量表示なし）。
+
 ### 電圧監視の診断（開発ブランチ）
 
 最新仕様（2026-10-10）: EasyEDAのGeaconPolaris → Bat → P1

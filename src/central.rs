@@ -4,6 +4,10 @@ use rmk::macros::rmk_central;
 #[cfg(feature = "lpps")]
 mod lpps;
 mod status_led;
+#[cfg(all(feature = "lpps", feature = "pmw3610"))]
+compile_error!("Select either LPPS or PMW3610: they share the module connector pins");
+#[cfg(feature = "pmw3610")]
+mod pmw3610;
 #[cfg(feature = "battery-audit")]
 mod battery_audit;
 #[rmk_central]
@@ -18,7 +22,7 @@ mod keyboard_central {
                 device_id: 0,
                 invert_x: true,
                 invert_y: true,
-                swap_xy: false,
+                swap_xy: cfg!(feature = "pmw3610"),
             },
         );
         let mut usb_transport = rmk::usb::UsbTransport::new(driver, rmk_config.device_config);
@@ -36,6 +40,16 @@ mod keyboard_central {
     #[Override(usb)]
     fn init_usb() {
         spawner.spawn(crate::runtime_status().unwrap());
+        #[cfg(feature = "pmw3610")]
+        {
+            use embassy_nrf::gpio::{Output, Input, Flex, Level, OutputDrive, Pull};
+            spawner.spawn(crate::pmw3610::run(
+                Output::new(p.P1_13, Level::High, OutputDrive::Standard),
+                Flex::new(p.P1_15),
+                Output::new(p.P1_12, Level::High, OutputDrive::Standard),
+                Input::new(p.P1_14, Pull::Up),
+            ).unwrap());
+        }
         #[cfg(feature = "battery-audit")]
         {
             let mut config = embassy_nrf::saadc::Config::default();
