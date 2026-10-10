@@ -26,6 +26,7 @@ embassy-usb-logger = { version = "0.6.0", features = ["nrf52840-adafruit-reset"]
 boot-audit = ["panic-probe/boot-recovery"]
 lpps = []
 pmw3610 = []
+iqs9151 = []
 battery-audit = []
 
 [patch.crates-io]

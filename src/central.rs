@@ -8,6 +8,12 @@ mod status_led;
 compile_error!("Select either LPPS or PMW3610: they share the module connector pins");
 #[cfg(feature = "pmw3610")]
 mod pmw3610;
+#[cfg(feature = "iqs9151")]
+mod iqs9151;
+#[cfg(feature = "iqs9151")]
+mod iqs9151_config;
+#[cfg(all(feature = "iqs9151", any(feature = "lpps", feature = "pmw3610")))]
+compile_error!("Select only one Madula input module");
 #[cfg(feature = "battery-audit")]
 mod battery_audit;
 #[rmk_central]
@@ -20,8 +26,8 @@ mod keyboard_central {
             &keymap,
             rmk::input_device::pointing::PointingProcessorConfig {
                 device_id: 0,
-                invert_x: true,
-                invert_y: true,
+                invert_x: !cfg!(feature = "iqs9151"),
+                invert_y: !cfg!(feature = "iqs9151"),
                 swap_xy: cfg!(feature = "pmw3610"),
             },
         );
@@ -40,6 +46,21 @@ mod keyboard_central {
     #[Override(usb)]
     fn init_usb() {
         spawner.spawn(crate::runtime_status().unwrap());
+        #[cfg(feature = "iqs9151")]
+        {
+            let mut config = embassy_nrf::twim::Config::default();
+            config.frequency = embassy_nrf::twim::Frequency::K400;
+            config.sda_pullup = true;
+            config.scl_pullup = true;
+            static TX: static_cell::StaticCell<[u8; 32]> = static_cell::StaticCell::new();
+            let i2c = embassy_nrf::twim::Twim::new(
+                p.TWISPI0, crate::iqs9151::Irqs, p.P1_14, p.P1_13, config,
+                TX.init([0; 32]),
+            );
+            spawner.spawn(crate::iqs9151::run(i2c,
+                embassy_nrf::gpio::Input::new(p.P1_12, embassy_nrf::gpio::Pull::Up),
+            ).unwrap());
+        }
         #[cfg(feature = "pmw3610")]
         {
             use embassy_nrf::gpio::{Output, Input, Flex, Level, OutputDrive, Pull};
