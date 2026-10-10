@@ -59,7 +59,7 @@ pub async fn run(mut spi: spim::Spim<'static>) {
                 sums[1] += sample(&mut spi, 7).await? as i64;
             }
             let zero = [(sums[0] / 100) as i32, (sums[1] / 100) as i32];
-            log::info!("LPPS baseline={:?}; pointer enabled; deadzone=1500", zero);
+            log::info!("LPPS baseline={:?}; pointer enabled; deadzone=2500; filter=1/4", zero);
             let mut axes = [motion::AxisMotion::default(), motion::AxisMotion::default()];
             let mut count = 0u32;
             loop {
