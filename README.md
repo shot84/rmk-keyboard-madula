@@ -63,9 +63,14 @@ RL2=1MΩが昇圧前・QL8後の電池側ノードから`INPUT_VOLTAGE_B`へ、R
 電池側電圧はADCピン電圧×1470/470で換算します。raw=483なら約1328mV。
 ユーザーの実機はNiMH 1本。CDCで`pin_mv`と`battery_mv`を10秒ごとに表示します。
 換算版を書き込み、CDCでraw=484 / pin_mv=425 / battery_mv=1330とLPPS測定継続を確認済み。
-残量%・充電判定・電池用LED表示は未実装。テスターとの精度照合も未実施です。
+残量目安はPolaris_hardware.dtsiのNiMH表を流用:
+`1100 1150 1200 1220 1240 1260 1280 1300 1320 1350 1400` mVを0～100%の10%刻みに対応させ、
+区間を線形補間します。負荷・温度で変わる電圧ベースの推定で、正確な残容量ではありません。
+外付けLEDは起動5秒付近と以後60秒周期で1秒表示: 50%超=緑、21～50%=橙、20%以下=赤。
+接続表示とレイヤー点滅を優先。測定値が30秒以上古い場合や範囲外なら残量色を表示しません。
+充電判定とOSへのBLE残量通知は未実装。テスターとの精度照合も未実施です。
 `rustc +stable --test src/battery_voltage.rs -o target/battery-voltage-tests && target/battery-voltage-tests`
-で換算と範囲外入力の2テストを実行できます。以下は換算確定前の調査履歴です。
+で換算・範囲外入力・NiMH推定境界の3テストを実行できます。以下は換算確定前の調査履歴です。
 
 `bash scripts/build-docker.sh --bin madula-central --features lpps,battery-audit`
 でLPPSと独立したSAADC診断を有効化します。Madulaの既存ZMK設定に合わせて

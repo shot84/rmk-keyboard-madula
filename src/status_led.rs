@@ -61,9 +61,15 @@ pub async fn run(mut spi: spim::Spim<'static>, mut power: Output<'static>,
         red.set_level(if onboard[0] != 0 { embassy_nrf::gpio::Level::Low } else { embassy_nrf::gpio::Level::High });
         green.set_level(if onboard[1] != 0 { embassy_nrf::gpio::Level::Low } else { embassy_nrf::gpio::Level::High });
         blue.set_level(if onboard[2] != 0 { embassy_nrf::gpio::Level::Low } else { embassy_nrf::gpio::Level::High });
+        #[cfg(feature = "battery-audit")]
+        let battery_rgb = crate::battery_audit::led_rgb(now);
+        #[cfg(not(feature = "battery-audit"))]
+        let battery_rgb = [0; 3];
         let rgb = if now < status_until { status }
-            else if elapsed < u64::from(layer)*240 && (elapsed/120)%2 == 0 { [32; 3] }
-            else { [0; 3] };
+            else if elapsed < u64::from(layer)*240 {
+                if (elapsed/120)%2 == 0 { [32; 3] } else { [0; 3] }
+            }
+            else { battery_rgb };
         if rgb != [0; 3] {
             last_lit = now;
             if !powered {
