@@ -31,7 +31,8 @@ RMK 0.9のスリープ通知はBLE接続管理とPeripheralManagerが各1枠を�
 - 50＋3の物理位置を維持。CornixリポジトリのMadula用5レイヤーを基準に移植
 - SpaceのFn/Num長押し、EscapeのBT長押し、Ctrl/Escapeのmod-tapを設定（実機タイミングは未検証）
 - LayoutShift、BTプロファイル操作は未移植。その位置は誤操作防止のためNoに設定
-- TB(PMW3610)、LPPS(ADS1220)、IQS9151、左右エンコーダ、LED、電圧監視は未実装
+- 右エンコーダ: A=P1.04/B=P1.06、内部プルアップ、4カウント/段。全レイヤーでCW=下スクロール、CCW=上スクロールを設定（実機方向・段数は確認待ち）
+- TB(PMW3610)、LPPS(ADS1220)、IQS9151、左エンコーダ、LED、電圧監視は未実装
 - DYA StudioはZMK用のため、この版では利用できません。Vial等の編集対応も未実装
 - 3台ともUSB CDC ACM Debugログ・1200 baud bootを実装し、実機でリセット・再書き込み・COM復帰を確認済み
 
@@ -75,7 +76,11 @@ CDCは仮想シリアルで、指定baudはUART通信速度を設定するもの
 マウスキーの方向は移植していますが、速度・タップ判定はRMKの動作になります。
 参照元のnaviは到達用キーがなく、内部のMO(7)も未定義レイヤーを指すため、
 勝手に新しい操作を追加せず、naviを保持したうえでMO(7)の位置はNoにしています。
-左右エンコーダのsensor-bindingsは、エンコーダ実装時に移植します。
+右エンコーダはRMK標準encoder ID 0として有効化しています。
+割り当てはCentralが処理するため、追加時にはCentralと右Peripheralの両方を更新します。
+2026-10-10: 対応版を両方へCDC経由で書き込み、右のBLE再接続とCentralの40秒稼働を確認。
+スクロール操作・方向・段数のユーザー確認は保留です。
+左エンコーダのsensor-bindingsは未移植です。
 
 Rust 1.94.1、ARM用GCC、libclangが必要です。Ubuntuでは
 gcc-arm-none-eabi / libnewlib-arm-none-eabi / libclang-devが相当します。

@@ -47,6 +47,20 @@ class BringupConfig(unittest.TestCase):
         # RMK 0.9's BLE profile naming reserves space: max 22 UTF-8 bytes.
         self.assertLessEqual(len(self.cfg["keyboard"]["product_name"].encode("utf-8")), 22)
 
+    def test_right_encoder_scroll(self):
+        left, right = self.cfg["split"]["peripheral"]
+        self.assertNotIn("input_device", left)
+        encoder, = right["input_device"]["encoder"]
+        self.assertEqual((encoder["pin_a"], encoder["pin_b"]), ("P1_04", "P1_06"))
+        self.assertTrue(encoder["internal_pullup"])
+        self.assertEqual(encoder["phase"], "resolution")
+        self.assertEqual(encoder["resolution"], 4)
+        matrix_pins = right["matrix"]["row_pins"] + right["matrix"]["col_pins"]
+        self.assertNotIn(encoder["pin_a"], matrix_pins)
+        self.assertNotIn(encoder["pin_b"], matrix_pins)
+        for layer in self.cfg["keymap"]["layer"]:
+            self.assertEqual(layer["encoders"], [["MouseWheelDown", "MouseWheelUp"]])
+
     def test_split_sleep_subscriber_capacity(self):
         # Pinned RMK 0.9 adds two split+BLE subscribers to the configured base.
         peripherals = len(self.cfg["split"]["peripheral"])
