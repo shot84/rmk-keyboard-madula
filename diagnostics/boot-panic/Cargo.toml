@@ -1,0 +1,14 @@
+[package]
+name = "madula-boot-panic"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[features]
+boot-recovery = []
+
+[dependencies]
+original-panic-probe = { package = "panic-probe", version = "1", features = ["print-defmt"] }
+cortex-m = "0.7.7"
+cortex-m-rt = "0.7.5"
+embassy-nrf = { version = "0.11", features = ["nrf52840", "unstable-pac"] }

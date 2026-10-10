@@ -1,6 +1,6 @@
 [keyboard]
 name = "Madula RMK"
-product_name = "Madula RMK experimental"
+product_name = "Madula RMK"
 manufacturer = "te9no"
 # Development-only IDs from RMK's example; not a production allocation.
 vendor_id = 0x4c4b

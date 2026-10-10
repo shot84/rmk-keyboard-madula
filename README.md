@@ -5,6 +5,17 @@ Cornix左右＋MadulaをRMK化する独立した実験用リポジトリ。
 
 ## 現段階
 
+2026-10-10更新: XIAO上でMadula Central通常版（設定保存有効）のUSB CDC列挙を確認。
+これまでの起動失敗はBLE名`Madula RMK experimental`が22バイト上限を超え、
+RMKのGATTサーバー生成でpanicしたことが原因でした。`Madula RMK`へ短縮済みです。
+panicをRAMへ保存して読み出した実機ログで特定しました。
+以下の調査履歴にある保存処理・起動順序の疑いは原因確定前の仮説です。
+Cornix左右との接続、キー入力、ポインティング、長時間動作は未確認です。
+修正後の通常版から1200 baudリセット→UF2ドライブ→同じ通常版の再書き込み→
+COM復帰も実機確認済みです。現在XIAOにはこの通常版が入っています。
+CDCで`Start scanning peripherals`と10秒・20秒の稼働ログ
+（`storage=enabled`, `boot_audit=false`）も確認済みです。
+
 - Madula: nRF52840 Central、直接接続の3キー、USB/BLEホスト接続
 - Cornix左・右: nRF52840 BLE Peripheral、各4×7マトリクス
 - 50＋3の物理位置を維持。CornixリポジトリのMadula用5レイヤーを基準に移植
@@ -12,7 +23,7 @@ Cornix左右＋MadulaをRMK化する独立した実験用リポジトリ。
 - LayoutShift、BTプロファイル操作は未移植。その位置は誤操作防止のためNoに設定
 - TB(PMW3610)、LPPS(ADS1220)、IQS9151、左右エンコーダ、LED、電圧監視は未実装
 - DYA StudioはZMK用のため、この版では利用できません。Vial等の編集対応も未実装
-- 3台ともUSB CDC ACM Debugログを有効化（実機未確認）。1200 baud bootは未実装
+- 3台ともUSB CDC ACM Debugログ・1200 baud bootを実装（RMK一式の実機動作は未確認）
 
 RMK 0.9.0を固定し、依存解決はCargo.lockで固定します。
 参考: [RMK split](https://rmk.rs/main/docs/features/split_keyboard)、
@@ -35,8 +46,10 @@ CDCは仮想シリアルで、指定baudはUART通信速度を設定するもの
 - USB初期化前のログ、クラッシュ直前のログの取得は保証しません。
 - 1 KiBバッファを超えるログは欠落し得ます。常時トレースの保存用途ではありません。
 - 入力イベントがログに含まれ得るため、パスワード入力中の収集やログの無確認公開は避けてください。
-- 1200 baudリセット、CDCコマンド、DYA Studio接続は提供しません。
-- COM列挙・再接続・HID/BLEとの同時動作は、まだ実機未検証です。
+- 1200 baudでDTRを500 ms以上有効にしてから落とすと、Adafruitブートローダーへリセットします。
+- CDCコマンド、DYA Studio接続は提供しません。
+- XIAO CentralのCOM/HID列挙と再書き込み後の復帰は確認済み。左右PeripheralとBLE通信は未検証です。
+- Centralは10秒ごとに稼働秒数を出力します。これは実行タスクの生存確認であり、左右接続成功を意味しません。
 
 参考: [RMK USB Logging](https://rmk.rs/v0.7.8/guide/features/usb_logging)、
 [RMK 0.9.0の機能定義](https://docs.rs/crate/rmk/0.9.0/features)。
@@ -71,12 +84,87 @@ madula-central、cornix-left、cornix-right（ELF）。
 
 2026-10-10: Rust 1.94.1、Docker内Zephyr SDK＋libclangで
 `cargo build --release --locked --bins`成功（3/3）。
-Madula用5レイヤー＋USB CDCログで3台分を再ビルド成功、設定テスト6件成功。
-実機起動・BLE接続・入力は未確認です。
+Madula用5レイヤー＋USB CDCログで3台分を再ビルド成功、設定・UF2テスト9件成功。
+XIAO Centralの起動確認済み。BLE接続・キー入力は未確認です。
 
-## 書き込み禁止の段階
+## XIAOの自動リセット・診断書き込み
 
-現時点のELFはコンパイル検証用です。UF2生成・配布・書き込みは行いません。
+2026-10-10: XIAO nRF52840 Sense / UF2 0.6.1 / S140 7.3.0で、
+専用の`diagnostics/cdc-smoke`を0x27000へ書き込み、CDCログ受信、
+1200 baud自動リセット、UF2ドライブ復帰、自動再書き込み、ログ復帰を確認しました。
+この診断ファームはキー・BLE・センサー・設定保存を使用しません。
+RMK一式の起動やCornix左右のブートローダー互換性を実証するものではありません。
+
+Windowsの` scripts/flash-xiao.ps1 `は、明示したCOMのPNP識別情報、
+UF2のアドレス・family ID・ベクタ、復帰したドライブのBoard-IDとSoftDeviceを検査し、
+CURRENT.UF2をtarget/backupsへ退避してからコピーします。Cornixには使用しないでください。
+実行時は`-Firmware`、`-Port`、`-ExpectedPnpDeviceId`を指定します。`-WhatIf`で書き込みを抑止できます。
+CDC未対応のファームから最初に移行するときは、手動でブートローダーを起動する必要があります。
+ローカルでシリアルポートを開けるアプリはリセットも実行できる点に注意してください。
+
+`vendor/embassy-usb-logger`は0.6.0に制御線監視を追加したローカル改変です。
+通常の115200 baudでの開閉ではリセットしません。状態遷移のホストテスト2件も成功。
+
+## RMK一式の起動調査
+
+2026-10-10: 同じXIAOへMadula Central本体を書き込みましたが、
+USB CDC/HIDの列挙を確認できませんでした。起動成功とは扱いません。
+専用CDC診断ファームの成功とは区別し、RMK本体は原因調査中です。
+CDCが出ない状態からの復帰には手動のブートローダー起動が必要です。
+Cornix左右の書き込みは未実施、RMK一式のUF2配布は行いません。
+その後、同じXIAOをCDC専用診断版へ戻し、COM列挙とログ受信の復旧を確認しました。
+
+重要な未解決点: 現在のmemory.xは旧SoftDeviceを保護する0x27000配置ですが、
+[RMKのSDC移行手順](https://rmk.rs/main/docs/migration/v06_v07)は
+Adafruitブートローダー使用時に0x1000配置へ変更し、旧SoftDeviceを上書きする構成です。
+現在の配置は公式移行構成と一致していません。これだけで停止原因を断定はしませんが、
+次の検証にはSoftDevice領域を書き換える承認と、XIAOのブートローダー／SoftDevice復旧手順が必要です。
+通常のアプリUF2の退避だけでZMKへ完全復旧できるとは扱いません。
+
+続いてユーザー承認のもと、memory.xを0x1000開始・0xD4000終端へ変更し、
+同じXIAOへUF2を転送しましたが、USB列挙は依然として確認できませんでした。
+配置だけを原因と断定しません。次回の手動ブートローダー復帰後にCURRENT.UF2を
+読み戻して転送内容を照合し、その後BLE/ストレージなどの初期化を段階的に調査します。
+初回CURRENT.UF2には0x1000–0x26FFFの全608ブロックが含まれており、
+`scripts/extract-softdevice.py`でMBR・ブートローダーを除いた復旧用UF2を作成済みです。
+復旧用データはtarget/backupsにローカル保存し、公開しません。復旧書き込み自体は未検証です。
+
+追加切り分け（2026-10-10）:
+- CURRENT.UF2の読み戻しで本体479,404バイトがビルド出力と完全一致。転送不良ではありません。
+- `xiao-ble-init`診断版は0x1000配置でCDC起動、MPSL初期化成功、
+  RMKと同じ2 peripheral/1 central側host接続枠のSDC初期化成功をログで確認。
+- 本体でDCDC reg0/reg1を無効化した比較版もUSB列挙なし。効果がないためソース設定は戻しました。
+- 次はUSB起動前に行われる設定保存・キーマップ初期化を調査します。原因は未確定です。
+  現在実機にはDCDC無効化比較版が入り、CDC復帰には再び手動ブートローダー起動が必要です。
+
+設定保存の切り分け（同日、上記の実機状態を更新）:
+- storage機能とstorage.enabledを無効化したMadula CentralはUSB CDCとして列挙しました。
+  左右Peripheralはstorage無効時にRMKマクロのコンパイルエラーとなるため、この比較はCentralのみです。
+- USBを先に起動する`xiao-ble-init`へ設定保存初期化を追加し、
+  `storage completed = true`を実機CDCログで確認しました。
+- 設定保存を再び有効化した通常Centralは、初期化済み領域でもUSB列挙しませんでした。
+  保存領域の破損だけでは説明できず、通常版の初期化順序・処理経路を調査する必要があります。
+- ソースはstorage有効へ戻しています。現在実機は通常Centralの比較版で、
+  次回書き込みには手動でUF2ブートローダーへ戻す必要があります。
+
+起動監視の比較:
+- 先行CDC診断版ではCentralと同じ5行14列・5レイヤー（無効キー）の
+  `initialize_keymap_and_storage`も完了し、独立監視タスクのstage=4を継続受信。
+- 通常Centralの`boot-audit`機能はUSBドライバ作成前に100ms待機し、
+  20秒後にブートローダー復帰するタスクを起動します。実機ではUSB列挙も
+  20秒後の復帰も確認できませんでした。単なる非同期の保存待機とは断定できません。
+- 現在のXIAOはこのboot-audit比較版。再度手動復帰が必要です。
+  boot-auditは通常ビルドでは無効で、製品機能ではありません。
+
+原因確定:
+- `boot-audit`に診断用panic/HardFault処理を追加。上位RAMを予約して記録を残し、
+  GPREGRET=0x57でブートローダーへ戻ります。読み取り版も同じRAM予約でビルドします。
+- 実機記録: `rmk-0.9.0/src/ble/mod.rs:229`、
+  `Device name is too long. Max length is 22 bytes`でunwrapがpanic。
+- product_nameを23バイトから10バイトへ短縮した通常版でUSB CDC復帰。
+  保存無効化やDCDC変更は採用せず、名前のUTF-8バイト数をテストに追加しました。
+- RAM記録は診断用で、電源断後の保持は保証しません。通常ビルドのpanic処理は
+  元のpanic-probeを使用し、20秒リセット・診断用RAM予約は無効です。
 3台それぞれのブートローダー、SoftDevice/MBR、アプリ起動番地と
 書き戻し手順の確認が必要です。memory.xは候補であり、起動実証済みではありません。
 RMKの保存領域0xE0000–0xEFFFFは既存ZMKの設定領域と重なります。

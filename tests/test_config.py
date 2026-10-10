@@ -43,6 +43,10 @@ class BringupConfig(unittest.TestCase):
         for layer in self.cfg["keymap"]["layer"]:
             self.assertEqual(len(layer["keys"].split()), 53)
 
+    def test_ble_device_name_length(self):
+        # RMK 0.9's BLE profile naming reserves space: max 22 UTF-8 bytes.
+        self.assertLessEqual(len(self.cfg["keyboard"]["product_name"].encode("utf-8")), 22)
+
     def test_madula_tap_hold_and_buttons(self):
         layers = [layer["keys"].split() for layer in self.cfg["keymap"]["layer"]]
         self.assertEqual(layers[0][12], "LT(3,Escape)")
@@ -59,7 +63,7 @@ class BringupConfig(unittest.TestCase):
 
     def test_flash_boundaries(self):
         # These conservative boundaries do NOT certify the installed bootloader.
-        self.assertEqual(0x27000 + 692 * 1024, 0xD4000)
+        self.assertEqual(0x1000 + 844 * 1024, 0xD4000)
         storage = self.cfg["storage"]
         self.assertGreaterEqual(storage["start_addr"], 0xD4000)
         self.assertLessEqual(storage["start_addr"] + storage["num_sectors"] * 4096, 0xF4000)
@@ -72,7 +76,7 @@ class BringupConfig(unittest.TestCase):
         self.assertNotIn("defmt", rmk["features"])
         self.assertIn("release_max_level_debug", manifest["dependencies"]["log"]["features"])
         self.assertEqual({binary["name"] for binary in manifest["bin"]},
-                         {"madula-central", "cornix-left", "cornix-right"})
+                         {"madula-central", "cornix-left", "cornix-right", "xiao-ble-init"})
 
 
 if __name__ == "__main__":

@@ -18,8 +18,15 @@ embassy-nrf = { version = "0.11", features = ["defmt", "nrf52840", "time-driver-
 embassy-executor = { version = "0.10", features = ["defmt", "platform-cortex-m", "executor-thread"] }
 defmt = "1"
 defmt-rtt = "1"
-panic-probe = { version = "1", features = ["print-defmt"] }
+panic-probe = { package = "madula-boot-panic", path = "diagnostics/boot-panic" }
 static_cell = "2"
+embassy-usb-logger = { version = "0.6.0", features = ["nrf52840-adafruit-reset"] }
+
+[features]
+boot-audit = ["panic-probe/boot-recovery"]
+
+[patch.crates-io]
+embassy-usb-logger = { path = "vendor/embassy-usb-logger" }
 
 [[bin]]
 name = "madula-central"
@@ -30,6 +37,10 @@ path = "src/left.rs"
 [[bin]]
 name = "cornix-right"
 path = "src/right.rs"
+
+[[bin]]
+name = "xiao-ble-init"
+path = "diagnostics/ble-init.rs"
 
 [profile.release]
 codegen-units = 1
