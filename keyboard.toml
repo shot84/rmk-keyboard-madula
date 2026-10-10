@@ -24,7 +24,7 @@ layers = 5
 # Layer order: base, func, num, bt, navi.
 
 [[keymap.layer]]
-encoders = [["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 Tab Q W E R T                    Y U I O P Backspace
 LT(3,Escape) A S D F G            H J K L Backslash Enter
@@ -34,7 +34,7 @@ MouseBtn1 MouseBtn3 MouseBtn2
 """
 
 [[keymap.layer]]
-encoders = [["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 _ PageUp Up PageDown _ _         F1 F2 F3 F4 F5 _
 _ Left Down Right _ _            F6 F7 F8 F9 F10 _
@@ -45,7 +45,7 @@ _ _ _
 
 [[keymap.layer]]
 # BT clear and LayoutShift are intentionally inactive until ported.
-encoders = [["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 No Kc1 Kc2 Kc3 Kc4 Kc5           Kc6 Kc7 Kc8 Kc9 Kc0 _
 No _ _ _ _ _                    Minus Equal LeftBracket RightBracket Backslash _
@@ -56,7 +56,7 @@ _ _ _
 
 [[keymap.layer]]
 # ZMK BT_SEL / BT_CLR_ALL are not mapped to RMK host profiles yet.
-encoders = [["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
 keys = """
 No No No No _ _                 _ _ _ _ _ _
 No _ _ _ _ _                    _ _ _ _ _ _
@@ -67,7 +67,7 @@ _ _ _
 
 [[keymap.layer]]
 # Preserve source navi layout; source MO(7) targets a nonexistent layer.
-encoders = [["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
 # Mouse directions preserved, speed is RMK's rather than ZMK's numeric values.
 keys = """
 No No No MouseUp PageUp PageDown MouseBtn1 MouseBtn3 MouseBtn2 MouseWheelUp MouseWheelDown No
@@ -122,6 +122,15 @@ row2col = false
 row_pins = ["P0_30", "P0_31", "P0_29", "P0_02"]
 col_pins = ["P0_28", "P0_03", "P1_10", "P1_11", "P1_13", "P0_09", "P0_10"]
 
+# Left EC11, global encoder ID 0. Match ZMK pull-ups and 80/20 resolution.
+[[split.peripheral.input_device.encoder]]
+pin_a = "P1_04"
+pin_b = "P1_06"
+internal_pullup = true
+phase = "resolution"
+resolution = 4
+reverse = false
+
 [[split.peripheral]]
 rows = 4
 cols = 7
@@ -135,7 +144,7 @@ row_pins = ["P1_09", "P0_28", "P0_03", "P1_10"]
 col_pins = ["P0_30", "P0_31", "P0_29", "P0_02", "P1_13", "P0_10", "P0_09"]
 
 # Right Cornix EC11: same pins/pull-ups as ZMK; 80 steps / 20 triggers = 4.
-# Only the right encoder is enabled, so its global encoder ID is 0.
+# Right follows left, so its global encoder ID is 1.
 [[split.peripheral.input_device.encoder]]
 pin_a = "P1_04"
 pin_b = "P1_06"
