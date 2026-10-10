@@ -5,6 +5,32 @@ use rmk::macros::rmk_central;
 mod lpps;
 #[rmk_central]
 mod keyboard_central {
+    // RMK 0.9 initializes registered processors before keymap. Construct this
+    // keymap-dependent processor at entry instead; retain all default tasks.
+    #[Override(entry)]
+    fn run() {
+        use rmk::core_traits::Runnable;
+        let mut pointer = rmk::input_device::pointing::PointingProcessor::new(
+            &keymap,
+            rmk::input_device::pointing::PointingProcessorConfig {
+                device_id: 0,
+                invert_x: true,
+                invert_y: true,
+                swap_xy: false,
+            },
+        );
+        let mut usb_transport = rmk::usb::UsbTransport::new(driver, rmk_config.device_config);
+        let mut ble_transport = rmk::ble::BleTransport::new(
+            ble_controller, ble_addr, rmk_config,
+            [
+                rmk::split::PeripheralMatrixConfig { rows: 4, cols: 7, row_offset: 0, col_offset: 0 },
+                rmk::split::PeripheralMatrixConfig { rows: 4, cols: 7, row_offset: 0, col_offset: 7 },
+            ],
+        );
+        let mut wpm = rmk::processor::builtin::wpm::WpmProcessor::new();
+        rmk::run_all!(matrix, storage, keyboard, usb_transport, ble_transport,
+                      wpm, watchdog_runner, pointer).await;
+    }
     #[Override(usb)]
     fn init_usb() {
         spawner.spawn(crate::runtime_status().unwrap());

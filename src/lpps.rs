@@ -1,7 +1,10 @@
-//! Madula ADS1220 bring-up. No pointer output until hardware data is validated.
+//! Madula ADS1220 input with startup calibration and bounded XY velocity.
 //! Settings follow te9no/ads1220-zephyr-module and Cornix madula-trackpoint.
 use embassy_nrf::{bind_interrupts, peripherals, spim};
 use embassy_time::Timer;
+use rmk::event::{publish_event, Axis, AxisEvent, AxisValType, PointingEvent};
+#[path = "lpps_motion.rs"]
+mod motion;
 
 bind_interrupts!(pub struct Irqs {
     TWISPI0 => spim::InterruptHandler<peripherals::TWISPI0>;
@@ -56,11 +59,26 @@ pub async fn run(mut spi: spim::Spim<'static>) {
                 sums[1] += sample(&mut spi, 7).await? as i64;
             }
             let zero = [(sums[0] / 100) as i32, (sums[1] / 100) as i32];
-            log::info!("LPPS diagnostic baseline={:?}; pointer output disabled", zero);
+            log::info!("LPPS baseline={:?}; pointer enabled; deadzone=1500", zero);
+            let mut axes = [motion::AxisMotion::default(), motion::AxisMotion::default()];
             let mut count = 0u32;
             loop {
                 let x = sample(&mut spi, 0).await?;
                 let y = sample(&mut spi, 7).await?;
+                // Rail readings indicate invalid conversion or wiring: never move on them.
+                if x.abs() >= 0x7ffff0 || y.abs() >= 0x7ffff0 {
+                    log::warn!("LPPS ADC rail; output stopped, recalibrating");
+                    return Ok(());
+                }
+                let dx = axes[0].step(x - zero[0]);
+                let dy = axes[1].step(y - zero[1]);
+                if dx != 0 || dy != 0 {
+                    publish_event(PointingEvent { device_id: 0, axes: [
+                        AxisEvent { typ: AxisValType::Rel, axis: Axis::X, value: dx },
+                        AxisEvent { typ: AxisValType::Rel, axis: Axis::Y, value: dy },
+                        AxisEvent { typ: AxisValType::Rel, axis: Axis::Z, value: 0 },
+                    ] });
+                }
                 count += 1;
                 if count % 125 == 0 {
                     log::info!("LPPS raw=({}, {}) delta=({}, {})", x, y, x-zero[0], y-zero[1]);
