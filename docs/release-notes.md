@@ -8,9 +8,14 @@ Download the UF2 matching your hardware:
 | `cornix-right.uf2` | Cornix right peripheral |
 | `madula-lpps.uf2` | Madula central with LPPS |
 | `madula-tb.uf2` | Madula central with PMW3610 trackball |
+| `madula-iqs.uf2` | Madula central with IQS9151 touchpad |
 
 Use all three boards with RMK. ZMK peripherals are not compatible.
-Turn power off before exchanging Madula modules. IQS is not included yet.
+Turn power off before exchanging Madula modules.
+IQS provides half-speed pointer motion, one/two/three-finger taps for
+left/right/middle click, and two-finger vertical/horizontal scrolling.
+IQS basic operation has been user-confirmed; exhaustive gesture and long-duration
+testing remain incomplete. Pinch, tap-drag and inertia are not implemented.
 The Madula builds include the NiMH single-cell battery voltage estimate for
 the verified 1MΩ/470kΩ Bat divider and status LEDs.
 

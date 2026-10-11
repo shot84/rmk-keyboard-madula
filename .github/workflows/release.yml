@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [cornix-left, cornix-right, madula-lpps, madula-tb]
+        target: [cornix-left, cornix-right, madula-lpps, madula-tb, madula-iqs]
     steps:
       - uses: actions/checkout@v4
       - name: Install toolchain

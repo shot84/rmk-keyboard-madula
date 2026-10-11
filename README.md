@@ -30,7 +30,7 @@ USB/BLEホスト接続に対応する構成ですが、BLEホスト接続を含�
 | --- | --- | --- |
 | LPPS | 自由なXYカーソル移動。平滑化・デッドゾーン付き | リリースUF2あり |
 | PMW3610 / TB | トラックボールによるカーソル移動 | リリースUF2あり |
-| IQS9151 | カーソル、1/2/3本指タップ、2本指スクロール | このブランチのソースで対応。v0.1.0-rc.1には未収録 |
+| IQS9151 | カーソル、1/2/3本指タップ、2本指スクロール | v0.1.0-rc.2から配布対象 |
 
 IQSのタップは順に左・右・中央クリック。2本指移動は縦横スクロールです。
 ピンチ、タップドラッグ、慣性スクロールは対応していません。
@@ -50,9 +50,10 @@ LPPSは起動時に中立位置を校正するため、起動直後は触れず�
 | `cornix-right.uf2` | Cornix右 |
 | `madula-lpps.uf2` | LPPSを装着したMadula |
 | `madula-tb.uf2` | PMW3610を装着したMadula |
+| `madula-iqs.uf2` | IQS9151を装着したMadula（rc.2以降） |
 
 3台とも同じリリースのRMKファームウェアに揃えてください。ZMKの左右ファームウェアとは接続できません。
-公開済みの`v0.1.0-rc.1`はプレリリースです。
+`v0.1.0-rc.*`はプレリリースです。rc.1にはIQS版が含まれません。
 ELFはデバッグ用、JSONはビルド情報、`SHA256SUMS`は整合性確認用です。
 
 ### 2. 移行の準備
@@ -123,7 +124,7 @@ cargo +1.94.1 build --release --locked --bin madula-central --features iqs9151,b
 `lpps` / `pmw3610` / `iqs9151`は同時に有効化できません。
 `battery-audit`は対応回路の電圧監視・残量推定を有効にする機能名です。
 ELFは`target/thumbv7em-none-eabihf/release/`に生成されます。
-UF2を含む配布用パッケージは[`build-release.sh`](scripts/build-release.sh)を参照してください（現行の対象はCornix左右・LPPS・TB）。
+UF2を含む配布用パッケージは[`build-release.sh`](scripts/build-release.sh)を参照してください（Cornix左右・LPPS・TB・IQS）。
 
 Dockerでのビルドは[`build-docker.sh`](scripts/build-docker.sh)、GitHub Actionsでのビルドは
 [`Firmware release`](.github/workflows/release.yml)を利用できます。
