@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 variant, features = sys.argv[1:]
-if variant not in {"cornix-left", "cornix-right", "madula-lpps", "madula-tb"}:
+if variant not in {"cornix-left", "cornix-right", "madula-lpps", "madula-tb", "madula-iqs"}:
     raise SystemExit("Unknown variant")
 root = pathlib.Path("dist")
 data = {
