@@ -43,9 +43,16 @@ Reference: Azoteq IQS9150/IQS9151 datasheet sections 12.8–12.9 and Appendix A.
 
 2026-10-10: user confirmed cursor motion, but reported excessive sensitivity.
 The subsequent half-speed and gesture implementation passed seven host unit
-tests and twelve configuration tests and built successfully. These new gestures
-have not yet been flashed or hardware-validated. Direction and long-duration
-validation remain pending.
+tests and twelve configuration tests and built successfully.
+
+2026-10-10: gesture firmware from commit 3a7256e was flashed via COM79 after
+backing up the previous firmware. CDC confirmed product 0x09bc, completed
+initialization, and the half-speed / multi-finger gesture build running without
+errors during the observation window.
+2026-10-11: user confirmed the IQS firmware worked ("IQSもOKでした"). This records
+overall hardware acceptance of the flashed build, not separate certification of
+every gesture or transport. Dedicated cold-start, long-duration and USB/BLE
+coverage remain unverified.
 Before flashing, power off and fit the IQS
 module. Verify cold start, direction, finger release, USB/BLE and both Cornix
 peripherals. A successful compile is not evidence of hardware operation.
