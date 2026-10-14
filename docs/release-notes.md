@@ -1,5 +1,17 @@
 # Cornix + Madula — RMK experimental firmware
 
+## v0.1.0-rc.4
+
+- Cornix dual LEDs: layer/Caps Lock colors, Central connection indication,
+  300ms fade-in and 600ms fade-out, using PWM + EasyDMA.
+- Left encoder scrolls; right encoder provides Windows Radial Controller
+  rotation and press, over USB or BLE. Long-press opens the Dial menu.
+- Stable storage compatibility ID prevents ordinary rebuilds from resetting
+  pairing data. Re-pair once if an older build already lost its keys.
+- USB/BLE Dial, LED colors and the storage fix have user hardware acceptance.
+  This is still a prerelease, not exhaustive hardware certification.
+- No BLE-forced diagnostic routing or LED startup self-test in release builds.
+
 Download the UF2 matching your hardware:
 
 | File | Target |

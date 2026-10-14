@@ -1,11 +1,12 @@
-//! Madula status LEDs. SPI3 is independent of LPPS on TWISPI0.
-use embassy_nrf::{bind_interrupts, gpio::Output, peripherals, spim};
+//! Madula external LEDs use PWM0, independent of input module buses.
+use embassy_nrf::{gpio::Output, pwm::SequencePwm};
 use embassy_time::{Instant, Timer};
 use rmk::embassy_futures::select::{select3, Either3};
 use rmk::event::{ConnectionStatusChangeEvent, ConnectionType, EventSubscriber,
                  LayerChangeEvent, SubscribableEvent};
 
-bind_interrupts!(pub struct Irqs { SPIM3 => spim::InterruptHandler<peripherals::SPI3>; });
+#[path = "ws2812_pwm.rs"]
+mod driver;
 
 fn layer_rgb(layer: u8) -> [u8; 3] {
     match layer {
@@ -14,20 +15,27 @@ fn layer_rgb(layer: u8) -> [u8; 3] {
     }
 }
 
-fn encode(rgb: [u8; 3]) -> [u8; 24] {
-    let mut out = [0x40; 24];
-    for (i, value) in [rgb[1], rgb[0], rgb[2]].into_iter().enumerate() {
-        for bit in 0..8 { if value & (0x80 >> bit) != 0 { out[i*8+bit] = 0x70; } }
-    }
-    out
-}
-
 #[embassy_executor::task]
-pub async fn run(mut spi: spim::Spim<'static>, mut power: Output<'static>,
+pub async fn run(mut pwm: SequencePwm<'static>, mut power: Output<'static>,
                  mut red: Output<'static>, mut green: Output<'static>, mut blue: Output<'static>) {
     // Subscribe before USB enumeration so the initial state is not missed.
     let mut connections = ConnectionStatusChangeEvent::subscriber();
     let mut layers = LayerChangeEvent::subscriber();
+    #[cfg(feature = "led-self-test")]
+    {
+        power.set_low(); // Madula LED_EN_L is active low.
+        Timer::after_millis(100).await;
+        log::info!("Madula external LED PWM self-test: green for 3s");
+        for _ in 0..30 {
+            if !driver::send(&mut pwm, [0, 32, 0]).await {
+                log::warn!("Madula external LED PWM self-test failed");
+            }
+            Timer::after_millis(100).await;
+        }
+        let _ = driver::send(&mut pwm, [0; 3]).await;
+        power.set_high();
+        log::info!("Madula external LED PWM self-test complete");
+    }
     let mut status = [32, 0, 0];
     let mut status_until = 0u64;
     let mut layer = 0;
@@ -80,12 +88,10 @@ pub async fn run(mut spi: spim::Spim<'static>, mut power: Output<'static>,
             }
         }
         if powered && rgb != last_rgb {
-            // Match ZMK's 4MHz encoding and >=280us low reset/latch time.
-            let result = spi.write(&encode(rgb)).await;
-            let reset = [0u8; 140];
-            let reset_result = spi.write(&reset).await;
-            if result.is_err() || reset_result.is_err() { log::warn!("LED SPI write failed"); }
-            else { last_rgb = rgb; }
+            if driver::send(&mut pwm, rgb).await {
+                last_rgb = rgb;
+                log::info!("Madula external LED PWM sent rgb={:?}", rgb);
+            } else { log::warn!("Madula external LED PWM write failed"); }
         }
         if powered && rgb == [0; 3] && now.saturating_sub(last_lit) >= 15000 {
             power.set_high();

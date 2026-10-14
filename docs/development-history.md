@@ -1,5 +1,52 @@
 # 開発記録アーカイブ
 
+## 2026-10-14: rc.4実機確認・統合
+
+- 保存互換ID修正版についてユーザーから「OKです」。通常版へ戻した後の受け入れ確認として記録。
+- Cornix左右Fn/Num/Caps色表示、USB/BLE Dialの実機確認あり。BLE固定診断コードを公開ソースから除去。
+- 全5機種の通常ビルドをrc.4として公開する。未使用のSPI LED試作ファイルは含めない。
+
+## 2026-10-14: 再ビルドによる保存領域初期化を修正
+
+- RMKの時刻/Git由来BUILD_HASHを、明示的な保存互換IDへ変更。現在の通常版の `0x225059d6` を継承し、互換形式の更新でボンドを消さない。
+- 保存形式変更時は `vendor/rmk/storage_schema.rs` の方針に従い移行またはID更新が必要。不明なID・明示的clear_storageの既存チェックは維持。
+- 実際のbuild.rsを2回コンパイル・実行して同じIDになるテストを追加。設定含む14テスト、通常TB版Dockerビルド成功。
+- 成果物 `dist/madula-tb-storage-stable.uf2`。既に消失した暗号鍵は復元できないため、再ペアリング後の電源再投入と更新をまたぐ復元は実機確認待ち。
+
+## 2026-10-14: 無線Dial診断・再ペアリングで動作確認
+
+- USBではメニュー表示OK、BLEでは表示できないという実機報告。
+- WindowsはMadulaのBLE HID collection 5をシステム多軸コントローラーとして認識、デバイスエラーなし。これは操作成功の証拠ではない。
+- `dial-ble-audit` featureを追加。DialのみBLEへ送信し、USB CDCでボタン/角度・BLE接続状態・通知結果を記録する。通常ビルドは従来の出力選択を維持し、接続設定は保存しない。
+- 診断成果物 `dist/madula-tb-dial-ble-audit.uf2`。Dockerビルド・設定12テスト成功。左右LED/TBドライバは変更なし。通知成功だけではWindowsのメニュー表示成功とは判断しない。
+- CDCで `Long term key request reply failed, no long term key` と接続直後の切断を確認。Windowsとの再ペアリング後、診断版で無線Dial表示OKとユーザー確認。
+- 通常版 `dist/madula-tb-normal.uf2` を `pmw3610,battery-audit` のみでビルド。BLE固定・起動セルフテストなし。設定領域は書き換えず、通常のUSB/BLE出力選択へ戻す。通常版での無線Dial再確認は保留。
+- 通常版への書き込み・起動確認後に暗号鍵エラーが再発。UF2は設定領域を含まないが、RMKの `build.rs` がビルド時刻入りBUILD_HASHを生成し、`storage::check_enable` の不一致で起動時に `erase_all` する実装を確認。設定維持の説明は不十分だった。ビルド間での保存互換性管理は要修正、通常版での再ペアリング/再起動後の復元は未確認。
+
+## 2026-10-14: Cornix LEDの状態表示とフェード
+
+- 2ピクセルをレイヤー/Caps LockとCentral接続状態に分離。
+- 点灯・色変更300ms、消灯600msのsmoothstepフェード。途中の変更は現在色から継続し、両ピクセルは独立して遷移する。
+- 消灯フェード終了後にLED電源を切る。フレームごとのCDCログはdebugへ下げた。
+- パターン/フェード4テスト、設定12テストと左右のDockerビルド成功。色・フェードの見た目は実機確認待ち。
+- 検証用成果物: `dist/cornix-left-fade.uf2` / `dist/cornix-right-fade.uf2`。起動時セルフテストなし。TB入力は変更していない。
+
+## 2026-10-14: Cornix左右の外付けLEDをPWMへ変更
+
+- SPI送信成功ログだけでは点灯せず、PWM0 + EasyDMAへ変更。
+  参考: https://github.com/numachang/cornix-rmk-custom/blob/main/src/ws2812.rs
+  ライセンスは `licenses/cornix-rmk-custom-MIT.txt` に保持。
+- 左右のキー入力、Fn長押し時の白点滅・解除時の青表示についてユーザー確認OK。
+  両側CDCでも `layer=1` → 白、`layer=0` → 青のPWM送信を確認。
+- 実機照合: 左のブートローダーID `E5082D6AF5183F1B`、右 `24A229C615D2D780`。
+  確認時は左COM110、右COM77。左を抜いたときCOM110が消えることを確認。
+  COM番号は固定識別子ではない。USBの共通シリアル `RMK:0.9.0` に依存せず、
+  抜き差しとブートローダー固有IDで照合する。
+- 書き込み済みは `dist/cornix-left-pwm.uf2` / `dist/cornix-right-pwm.uf2`。
+  `led-self-test` 有効の検証版（起動時に3秒緑点灯）。公開リリースではない。
+- Madula本体もPWM版を書き込み済みだが、外付けLEDの目視確認は別途必要。
+  TBはユーザー指定により保留し、入力処理は変更していない。
+
 旧READMEを保存した履歴です。未実装・未確認・現在の実機状態などの記述は当時のもので、更新前後の情報が混在します。
 現在の利用方法は[README](../README.md)、IQSの確認結果は[IQS資料](iqs9151-bringup.md)を参照してください。
 

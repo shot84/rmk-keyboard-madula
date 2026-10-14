@@ -30,6 +30,12 @@ jobs:
           /tmp/battery-tests
           rustc +1.94.1 --test src/iqs9151_gestures.rs -o /tmp/iqs-tests
           /tmp/iqs-tests
+          rustc +1.94.1 --test src/peripheral_led_pattern.rs -o /tmp/led-tests
+          /tmp/led-tests
+          rustc +1.94.1 --test src/ws2812_pwm_frame.rs -o /tmp/pwm-tests
+          /tmp/pwm-tests
+          rustc +1.94.1 --test src/radial_report.rs -o /tmp/dial-tests
+          /tmp/dial-tests
       - name: Build and package
         env:
           CC_thumbv7em_none_eabihf: arm-none-eabi-gcc

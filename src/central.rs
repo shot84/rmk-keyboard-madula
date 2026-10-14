@@ -4,6 +4,7 @@ use rmk::macros::rmk_central;
 #[cfg(feature = "lpps")]
 mod lpps;
 mod status_led;
+mod radial_controller;
 #[cfg(all(feature = "lpps", feature = "pmw3610"))]
 compile_error!("Select either LPPS or PMW3610: they share the module connector pins");
 #[cfg(feature = "pmw3610")]
@@ -31,6 +32,7 @@ mod keyboard_central {
                 swap_xy: cfg!(feature = "pmw3610"),
             },
         );
+        let mut dial = crate::radial_controller::RadialController;
         let mut usb_transport = rmk::usb::UsbTransport::new(driver, rmk_config.device_config);
         let mut ble_transport = rmk::ble::BleTransport::new(
             ble_controller, ble_addr, rmk_config,
@@ -41,7 +43,7 @@ mod keyboard_central {
         );
         let mut wpm = rmk::processor::builtin::wpm::WpmProcessor::new();
         rmk::run_all!(matrix, storage, keyboard, usb_transport, ble_transport,
-                      wpm, watchdog_runner, pointer).await;
+                      wpm, watchdog_runner, pointer, dial).await;
     }
     #[Override(usb)]
     fn init_usb() {
@@ -84,13 +86,14 @@ mod keyboard_central {
         }
         {
             use embassy_nrf::gpio::{Output, Level, OutputDrive};
-            let mut config = embassy_nrf::spim::Config::default();
-            config.frequency = embassy_nrf::spim::Frequency::M4;
-            let spi = embassy_nrf::spim::Spim::new_txonly_nosck(
-                p.SPI3, crate::status_led::Irqs, p.P0_28, config,
-            );
+            use embassy_nrf::pwm::{Config, Prescaler, SequenceLoad, SequencePwm};
+            let mut config = Config::default();
+            config.prescaler = Prescaler::Div1;
+            config.max_duty = 20;
+            config.sequence_load = SequenceLoad::Common;
+            let pwm = SequencePwm::new_1ch(p.PWM0, p.P0_28, config).unwrap();
             spawner.spawn(crate::status_led::run(
-                spi,
+                pwm,
                 Output::new(p.P0_03, Level::High, OutputDrive::Standard),
                 Output::new(p.P0_26, Level::High, OutputDrive::Standard),
                 Output::new(p.P0_30, Level::High, OutputDrive::Standard),

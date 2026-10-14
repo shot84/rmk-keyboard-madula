@@ -1,0 +1,25 @@
+// Adapted from sekigon-gonnoc/zmk-driver-hires-dial (353a21964a2f).
+// Copyright (c) 2026 sekigon-gonnoc
+// SPDX-License-Identifier: MIT
+use usbd_hid::descriptor::SerializedDescriptor;
+const DESCRIPTOR: &[u8] = &[
+    0x05, 0x01, 0x09, 0x0e, 0xa1, 0x01, 0x85, 0x05,
+    0x05, 0x0d, 0x09, 0x21, 0xa1, 0x00,
+    0x05, 0x09, 0x09, 0x01, 0x95, 0x01, 0x75, 0x01,
+    0x15, 0x00, 0x25, 0x01, 0x81, 0x02,
+    0x05, 0x01, 0x09, 0x37, 0x95, 0x01, 0x75, 0x0f,
+    0x55, 0x0f, 0x65, 0x14, 0x36, 0xf0, 0xf1,
+    0x46, 0x10, 0x0e, 0x16, 0xf0, 0xf1, 0x26, 0x10, 0x0e,
+    0x81, 0x06, 0xc0, 0xc0,
+];
+pub(crate) const BLE_REPORT_MAP_SIZE: usize = 178 + DESCRIPTOR.len();
+pub(crate) fn append_descriptor(base: &[u8], output: &mut [u8]) -> usize {
+    output[..base.len()].copy_from_slice(base);
+    output[base.len()..base.len() + DESCRIPTOR.len()].copy_from_slice(DESCRIPTOR);
+    base.len() + DESCRIPTOR.len()
+}
+pub(crate) fn ble_report_map() -> [u8; BLE_REPORT_MAP_SIZE] {
+    let mut result = [0; BLE_REPORT_MAP_SIZE];
+    append_descriptor(crate::hid::BleCompositeReport::desc(), &mut result);
+    result
+}

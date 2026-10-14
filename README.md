@@ -79,6 +79,21 @@ Windows用の[`flash-xiao.ps1`](scripts/flash-xiao.ps1)はMadulaのXIAO向け補
 
 ## キーマップとLED
 
+### Cornixのエンコーダ
+
+左の回転はスクロール、右の回転はWindows Radial Controller（Surface Dial互換）です。
+右の押し込みはDialボタンになり、長押しでWindowsのメニュー、短押しで選択を操作します。
+全レイヤーで共通です。回転は1ノッチ18度を初期値としています。
+USBとPCへのBLE接続の両方で実機動作を確認しています。
+BLEのHID定義が変わるため、更新後にPC側で登録を削除して再ペアリングが必要になる場合があります。
+Windowsのメニュー表示状態はファームから取得できません。
+保存形式の互換IDを固定し、通常の再ビルドによるペアリング情報の初期化を防いでいます。
+旧ファームで既に鍵が失われた場合は、更新後に一度再ペアリングしてください。
+
+HID実装は[sekigon-gonnoc/zmk-driver-hires-dial](https://github.com/sekigon-gonnoc/zmk-driver-hires-dial)
+を参考にしています。RMK 0.9.0はリポジトリ内の `vendor/rmk` に固定し、
+DialのUSB/BLEレポートと送信経路を追加しています。
+
 [`keyboard.toml`](keyboard.toml)でキー割り当てを管理します。
 CornixのMadula用キーマップを基準に、base / func / num / bt / naviの5レイヤーを保持しています。
 変更後は再ビルドが必要です。
@@ -87,8 +102,17 @@ CornixのMadula用キーマップを基準に、base / func / num / bt / naviの
 - ZMKのLayoutShiftとBTプロファイル操作は未移植で、該当位置は無効にしています。
 - naviへの到達キーは現在の標準割り当てにありません。
 
-外付けLEDはUSB接続をシアン、BLEホスト接続を青、未接続を赤で短く表示します。
+Madula本体の外付けLEDはUSB接続をシアン、BLEホスト接続を青、未接続を赤で短く表示します。
 レイヤー変更時は番号に応じた白点滅を表示します（baseは点滅なし）。
+
+Cornix左右の2連LEDはPWM＋EasyDMAで独立駆動します。
+内側（pixel 0）はFn＝薄い青、Num＝紫、BT＝シアン、navi＝橙で、
+そのレイヤーが有効な間点灯します。ホストからCaps Lock有効の通知を受けると白を優先します。
+外側（pixel 1）はMadulaへの接続成立時に緑を1.5秒表示し、未接続中は3秒ごとに橙を短く表示します。
+base・Caps Lock無効・接続正常時は消灯してLED電源を切ります。
+こちらはPCとの接続ではなく、CornixとMadula間の接続表示です。
+点灯・色の変更は約300ms、消灯は約600msで緩やかにフェードします。
+Cornix側のLED対応には左右それぞれのファームウェア更新が必要です。
 
 電池残量表示は、**NiMH 1本・1MΩ/470kΩ分圧の対応Bat基板**が対象です。
 緑は50%超、橙は21～50%、赤は20%以下の目安です。
@@ -147,3 +171,5 @@ Dockerでのビルドは[`build-docker.sh`](scripts/build-docker.sh)、GitHub Ac
 IQS9151の初期化設定は[ShiniNetのドライバー](https://github.com/ShiniNet/zmk-driver-iqs9151)とAzoteqの設定資料を、
 PMW3610の通信はRMKの実装と[3-wire SPIドライバー](https://github.com/te9no/zmk-driver-spi-three-wire)を参照しています。
 各プロジェクトの作者・貢献者に感謝します。取り込んだコードのライセンス表記はリポジトリ内に保持しています。
+
+Cornixの外付けLEDのPWM駆動は[numachang/cornix-rmk-custom](https://github.com/numachang/cornix-rmk-custom)を参考にしています。

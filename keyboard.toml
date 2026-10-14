@@ -26,22 +26,22 @@ layers = 5
 # Row 4 columns 3..9 are virtual IQS gesture keys, not physical switches.
 
 [[keymap.layer]]
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
 keys = """
 Tab Q W E R T                    Y U I O P Backspace
 LT(3,Escape) A S D F G            H J K L Backslash Enter
-LShift Z X C V B No No            N M Comma Dot Up Slash
+LShift Z X C V B No User22      N M Comma Dot Up Slash
 MT(Escape,LCtrl) LGui LAlt LT(1,Space) LT(2,Space) Backspace Language1 Language2 No Left Down Right
 MouseBtn1 MouseBtn3 MouseBtn2
 MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
 """
 
 [[keymap.layer]]
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
 keys = """
 _ PageUp Up PageDown _ _         F1 F2 F3 F4 F5 _
 _ Left Down Right _ _            F6 F7 F8 F9 F10 _
-_ Backspace Delete Home End _ _ _ F11 F12 Semicolon Quote _ _
+_ Backspace Delete Home End _ _ User22 F11 F12 Semicolon Quote _ _
 No No No _ _ Backspace           _ _ _ No No No
 _ _ _
 MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
@@ -49,11 +49,11 @@ MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWh
 
 [[keymap.layer]]
 # BT clear and LayoutShift are intentionally inactive until ported.
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
 keys = """
 No Kc1 Kc2 Kc3 Kc4 Kc5           Kc6 Kc7 Kc8 Kc9 Kc0 _
 No _ _ _ _ _                    Minus Equal LeftBracket RightBracket Backslash _
-_ Backspace Delete _ _ _ _ _     _ Slash Semicolon Quote _ _
+_ Backspace Delete _ _ _ _ User22 _ Slash Semicolon Quote _ _
 No No No Enter No No            No No _ No No No
 _ _ _
 MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
@@ -61,11 +61,11 @@ MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWh
 
 [[keymap.layer]]
 # ZMK BT_SEL / BT_CLR_ALL are not mapped to RMK host profiles yet.
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
 keys = """
 No No No No _ _                 _ _ _ _ _ _
 No _ _ _ _ _                    _ _ _ _ _ _
-No No No No No _ No _           _ _ _ _ _ _
+No No No No No _ No User22     _ _ _ _ _ _
 No No No _ _ _                  No No _ No No No
 _ _ _
 MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
@@ -73,12 +73,12 @@ MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWh
 
 [[keymap.layer]]
 # Preserve source navi layout; source MO(7) targets a nonexistent layer.
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["MouseWheelUp", "MouseWheelDown"]]
+encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
 # Mouse directions preserved, speed is RMK's rather than ZMK's numeric values.
 keys = """
 No No No MouseUp PageUp PageDown MouseBtn1 MouseBtn3 MouseBtn2 MouseWheelUp MouseWheelDown No
 No No MouseLeft MouseDown MouseRight MouseWheelUp Left Down Up Right No No
-No No No No No MouseWheelDown _ _ _ _ No No No No
+No No No No No MouseWheelDown _ User22 _ _ No No No No
 No No No No _ _                 No No Kc5 No No No
 _ _ _
 MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
@@ -108,6 +108,12 @@ subs = 2
 subs = 2
 [event.connection_status_change]
 subs = 2
+[event.led_indicator]
+subs = 3
+
+# Radial controller action consumer (User 20/21 rotation, 22 button).
+[event.action]
+subs = 1
 
 [split]
 connection = "ble"
