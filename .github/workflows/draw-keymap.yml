@@ -1,0 +1,35 @@
+name: Draw keymap
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "keyboard.toml"
+      - "scripts/keymap_drawer.py"
+
+permissions:
+  contents: write
+
+jobs:
+  draw:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Draw
+        run: |
+          pip install keymap-drawer==0.22.1
+          python3 scripts/keymap_drawer.py keyboard.toml keymap-drawer/madula.yaml keymap-drawer/madula_layout.json
+          keymap draw keymap-drawer/madula.yaml > keymap-drawer/madula.svg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keymap-drawer
+          path: keymap-drawer/
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add keymap-drawer
+          git diff --cached --quiet || git commit -m "[Draw] keymap"
+          git push
