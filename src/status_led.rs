@@ -8,6 +8,9 @@ use rmk::event::{ConnectionStatusChangeEvent, ConnectionType, EventSubscriber,
 #[path = "ws2812_pwm.rs"]
 mod driver;
 
+/// True while the host link is BLE; pointer tasks use it to merge samples.
+pub static BLE_ACTIVE: core::sync::atomic::AtomicBool = core::sync::atomic::AtomicBool::new(false);
+
 fn layer_rgb(layer: u8) -> [u8; 3] {
     match layer {
         0 => [0, 0, 32], 1 => [32, 0, 0], 2 => [0, 32, 0],
@@ -46,6 +49,8 @@ pub async fn run(mut pwm: SequencePwm<'static>, mut power: Output<'static>,
     loop {
         match select3(connections.next_event(), layers.next_event(), Timer::after_millis(10)).await {
             Either3::First(event) => {
+                BLE_ACTIVE.store(event.0.decide_active() == Some(ConnectionType::Ble),
+                                 core::sync::atomic::Ordering::Relaxed);
                 status = match event.0.decide_active() {
                     Some(ConnectionType::Usb) => [0, 32, 32],
                     Some(ConnectionType::Ble) => [0, 0, 32],

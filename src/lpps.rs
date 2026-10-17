@@ -1,10 +1,14 @@
 //! Madula ADS1220 input with startup calibration and bounded XY velocity.
 //! Settings follow te9no/ads1220-zephyr-module and Cornix madula-trackpoint.
 use embassy_nrf::{bind_interrupts, peripherals, spim};
-use embassy_time::Timer;
+use embassy_time::{Instant, Timer};
 use rmk::event::{publish_event, Axis, AxisEvent, AxisValType, PointingEvent};
 #[path = "lpps_motion.rs"]
 mod motion;
+
+/// Over BLE the host polls every ~15 ms, so one report per ~8 ms sample queues up and the
+/// pointer lags behind the stick. Merge samples and send at most once per this interval.
+const BLE_REPORT_MS: u64 = 15;
 
 bind_interrupts!(pub struct Irqs {
     TWISPI0 => spim::InterruptHandler<peripherals::TWISPI0>;
@@ -62,6 +66,8 @@ pub async fn run(mut spi: spim::Spim<'static>) {
             log::info!("LPPS baseline={:?}; pointer enabled; deadzone=2500; filter=1/4", zero);
             let mut axes = [motion::AxisMotion::default(), motion::AxisMotion::default()];
             let mut count = 0u32;
+            let mut pending = [0i32; 2];
+            let mut last_publish = Instant::now();
             loop {
                 let x = sample(&mut spi, 0).await?;
                 let y = sample(&mut spi, 7).await?;
@@ -72,7 +78,18 @@ pub async fn run(mut spi: spim::Spim<'static>) {
                 }
                 let dx = axes[0].step(x - zero[0]);
                 let dy = axes[1].step(y - zero[1]);
-                if dx != 0 || dy != 0 {
+                pending[0] += dx as i32;
+                pending[1] += dy as i32;
+                let interval = if crate::status_led::BLE_ACTIVE.load(core::sync::atomic::Ordering::Relaxed) {
+                    BLE_REPORT_MS
+                } else {
+                    0
+                };
+                if pending != [0, 0] && last_publish.elapsed().as_millis() >= interval {
+                    let dx = pending[0].clamp(i16::MIN as i32, i16::MAX as i32) as i16;
+                    let dy = pending[1].clamp(i16::MIN as i32, i16::MAX as i32) as i16;
+                    pending = [0, 0];
+                    last_publish = Instant::now();
                     publish_event(PointingEvent { device_id: 0, axes: [
                         AxisEvent { typ: AxisValType::Rel, axis: Axis::X, value: dx },
                         AxisEvent { typ: AxisValType::Rel, axis: Axis::Y, value: dy },
