@@ -62,7 +62,15 @@ pub async fn run(mut spi: spim::Spim<'static>) {
             log::info!("LPPS baseline={:?}; pointer enabled; deadzone=2500; filter=1/4", zero);
             let mut axes = [motion::AxisMotion::default(), motion::AxisMotion::default()];
             let mut count = 0u32;
+            // daily-diag: per second, events published and |dx|+|dy| published
+            let (mut np, mut psum) = (0u32, 0i32);
+            let mut t0 = embassy_time::Instant::now();
             loop {
+                if t0.elapsed().as_millis() >= 1000 {
+                    if np > 0 { log::info!("[lpps-tx] n={} sum={}", np, psum); }
+                    (np, psum) = (0, 0);
+                    t0 = embassy_time::Instant::now();
+                }
                 let x = sample(&mut spi, 0).await?;
                 let y = sample(&mut spi, 7).await?;
                 // Rail readings indicate invalid conversion or wiring: never move on them.
@@ -73,6 +81,8 @@ pub async fn run(mut spi: spim::Spim<'static>) {
                 let dx = axes[0].step(x - zero[0]);
                 let dy = axes[1].step(y - zero[1]);
                 if dx != 0 || dy != 0 {
+                    np += 1;
+                    psum += dx.abs() as i32 + dy.abs() as i32;
                     publish_event(PointingEvent { device_id: 0, axes: [
                         AxisEvent { typ: AxisValType::Rel, axis: Axis::X, value: dx },
                         AxisEvent { typ: AxisValType::Rel, axis: Axis::Y, value: dy },
