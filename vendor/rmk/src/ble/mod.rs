@@ -435,6 +435,7 @@ async fn gatt_events_task(server: &Server<'_>, conn: &GattConnection<'_, '_, Def
     let mouse = server.hid_service.mouse_report;
     let media = server.hid_service.media_report;
     let system_control = server.hid_service.system_report;
+    let radial = server.hid_service.radial_report;
 
     #[cfg(feature = "passkey_entry")]
     let mut passkey_state = PasskeyInputState::new();
@@ -542,6 +543,9 @@ async fn gatt_events_task(server: &Server<'_>, conn: &GattConnection<'_, '_, Def
                             || event.handle() == mouse.cccd_handle.expect("No CCCD for mouse report")
                             || event.handle() == media.cccd_handle.expect("No CCCD for media report")
                             || event.handle() == system_control.cccd_handle.expect("No CCCD for system report")
+                            // Without this the Dial subscription is never stored: Windows does not
+                            // rewrite it on a bonded reconnect, so the Dial went silent after reconnecting
+                            || event.handle() == radial.cccd_handle.expect("No CCCD for radial report")
                             || event.handle() == level.cccd_handle.expect("No CCCD for battery level")
                             || {
                                 #[cfg(feature = "split")]
