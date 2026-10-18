@@ -4,13 +4,16 @@ Based on te9no/rmk-keyboard-madula v0.1.0-rc.4 (`feb351c`), branch `review-daily
 See the README of this branch for what changed and why (Japanese).
 
 - BLE mouse reports are merged, paced to the connection interval (15 ms or slower)
-  and interpolated 8 ms back: the LPPS no longer lags over BLE on macOS or Windows.
+  and interpolated 8 ms back: the BLE lag of the LPPS is largely gone in our tests
+  (measured on macOS; Windows only briefly).
 - The Dial CCCD is stored, so the Dial keeps working after a bonded reconnect.
 - Vial keymap editing (vial.rocks / Vial app).
 - My own 8-layer keymap with the left wheel reversed.
 - Per-second diagnostics on the USB log only.
 
-**Switching between builds with and without Vial clears pairings and the stored keymap.**
+**Switching between builds with and without Vial clears pairings and the stored keymap**
+(seen going from without to with Vial; the other way is expected to do the same).
+Vial is always unlocked (no host lock): any connected computer can rewrite the keymap.
 The trackball and touchpad builds are untested on hardware.
 Cornix peripherals were left on rc.4 during testing.
 
