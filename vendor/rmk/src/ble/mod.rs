@@ -860,7 +860,23 @@ async fn serve_keyboard_connection<
         let mut cum = [0i32; 2];
         let mut prev = (embassy_time::Instant::now(), [0i32; 2]);
         let mut last = prev;
+        // daily-diag: per second, mouse reports in/out, |x|+|y| in/out, time in write_report, peak queue
+        let (mut rm, mut sm, mut rsum, mut ssum, mut nother) = (0u32, 0u32, 0i32, 0i32, 0u32);
+        let (mut busy_us, mut worst_us, mut maxq) = (0u64, 0u64, 0usize);
+        let mut t0 = embassy_time::Instant::now();
         loop {
+            if t0.elapsed().as_millis() >= 1000 {
+                if rm > 0 || nother > 0 {
+                    info!(
+                        "[ble-tx] in={} out={} sum_in={} sum_out={} other={} busy_ms={} worst_ms={} maxq={} ci_us={}",
+                        rm, sm, rsum, ssum, nother, busy_us / 1000, worst_us / 1000, maxq,
+                        conn.raw().params().conn_interval.as_micros()
+                    );
+                }
+                (rm, sm, rsum, ssum, nother, busy_us, worst_us, maxq) = (0, 0, 0, 0, 0, 0, 0, 0);
+                t0 = embassy_time::Instant::now();
+            }
+            maxq = maxq.max(BLE_REPORT_CHANNEL.len());
             let next = if acc.is_some() {
                 match BLE_REPORT_CHANNEL.try_receive() {
                     Ok(r) => Some(r),
@@ -881,6 +897,8 @@ async fn serve_keyboard_connection<
             match next {
                 Some(Report::MouseReport(m)) => {
                     let add = [m.x as i32, m.y as i32, m.wheel as i32, m.pan as i32];
+                    rm += 1;
+                    rsum += add[0].abs() + add[1].abs();
                     match acc.as_mut() {
                         Some((b, a)) if *b == m.buttons => {
                             for i in 0..4 {
@@ -907,6 +925,7 @@ async fn serve_keyboard_connection<
                     }
                 }
                 Some(other) => {
+                    nother += 1;
                     flush_all = true;
                     after = Some(other);
                 }
@@ -952,6 +971,8 @@ async fn serve_keyboard_connection<
                 if *a == [0; 4] {
                     acc = None;
                 }
+                sm += 1;
+                ssum += part[0].unsigned_abs() as i32 + part[1].unsigned_abs() as i32;
                 let s = embassy_time::Instant::now();
                 if let Err(e) = ble_hid_server.write_report(&r).await {
                     error!("Failed to send report: {:?}", e);
@@ -962,6 +983,9 @@ async fn serve_keyboard_connection<
                 let pace = conn.raw().params().conn_interval.max(embassy_time::Duration::from_millis(15));
                 let waited = s.elapsed() > embassy_time::Duration::from_millis(2);
                 next_mouse = embassy_time::Instant::now() + if waited { pace * 2 } else { pace };
+                let d = s.elapsed().as_micros();
+                busy_us += d;
+                worst_us = worst_us.max(d);
                 if !flush_all {
                     break;
                 }
