@@ -837,10 +837,143 @@ async fn serve_keyboard_connection<
     };
 
     let writer_task = async {
+        // The BLE link drains fewer reports than a pointing device produces, so mouse
+        // reports pile up and the pointer keeps moving after the stick is released.
+        // Merge every queued mouse report with the same buttons into one before sending;
+        // motion beyond the i8 range is carried into the next report.
+        use crate::hid::Report;
+        // Pending mouse motion: buttons and x, y, wheel, pan
+        let mut acc: Option<(u8, [i32; 4])> = None;
+        // Send at most one mouse report per connection interval. Faster than that, reports wait
+        // in the controller's TX queue whenever the host skips connection events (seen on macOS
+        // at 15 ms), and the pointer lags by the whole queue.
+        let mut next_mouse = embassy_time::Instant::now();
+        // Paced reports catch one or two pointer samples each (8 ms samples, 15 ms interval on
+        // macOS), so the step size jumps. Send the motion as it stood a little earlier instead,
+        // interpolated between the last two samples: each report then covers the same span of time.
+        const LAG: embassy_time::Duration = embassy_time::Duration::from_millis(8);
+        // Running x, y total of this movement and when the last two samples arrived
+        let mut cum = [0i32; 2];
+        let mut prev = (embassy_time::Instant::now(), [0i32; 2]);
+        let mut last = prev;
         loop {
-            let report = BLE_REPORT_CHANNEL.receive().await;
-            if let Err(e) = ble_hid_server.write_report(&report).await {
-                error!("Failed to send report: {:?}", e);
+            let next = if acc.is_some() {
+                match BLE_REPORT_CHANNEL.try_receive() {
+                    Ok(r) => Some(r),
+                    // Keep merging until the next connection event is due
+                    Err(_) if embassy_time::Instant::now() < next_mouse => {
+                        match select(BLE_REPORT_CHANNEL.receive(), Timer::at(next_mouse)).await {
+                            Either::First(r) => Some(r),
+                            Either::Second(_) => None,
+                        }
+                    }
+                    Err(_) => None,
+                }
+            } else {
+                Some(BLE_REPORT_CHANNEL.receive().await)
+            };
+            let mut flush_all = false;
+            let mut after = None;
+            match next {
+                Some(Report::MouseReport(m)) => {
+                    let add = [m.x as i32, m.y as i32, m.wheel as i32, m.pan as i32];
+                    match acc.as_mut() {
+                        Some((b, a)) if *b == m.buttons => {
+                            for i in 0..4 {
+                                a[i] += add[i];
+                            }
+                            cum = [cum[0] + add[0], cum[1] + add[1]];
+                            prev = last;
+                            last = (embassy_time::Instant::now(), cum);
+                            continue;
+                        }
+                        Some(_) => {
+                            // Buttons changed: send the old motion first, then start anew
+                            flush_all = true;
+                            after = Some(Report::MouseReport(m));
+                        }
+                        None => {
+                            acc = Some((m.buttons, add));
+                            let now = embassy_time::Instant::now();
+                            cum = [add[0], add[1]];
+                            prev = (now - LAG, [0, 0]);
+                            last = (now, cum);
+                            continue;
+                        }
+                    }
+                }
+                Some(other) => {
+                    flush_all = true;
+                    after = Some(other);
+                }
+                None => {}
+            }
+            // Send pending motion: one report when the queue ran dry, all of it before another report
+            while let Some((b, a)) = acc.as_mut() {
+                // Motion that arrived after `now - LAG` waits for a later report (all of it goes
+                // out at once before another kind of report)
+                let mut hold = [0i32; 2];
+                if !flush_all {
+                    let t = embassy_time::Instant::now().checked_sub(LAG).unwrap_or(prev.0);
+                    let target = if t >= last.0 {
+                        last.1
+                    } else if t <= prev.0 {
+                        prev.1
+                    } else {
+                        let (span, into) = ((last.0 - prev.0).as_micros() as i64, (t - prev.0).as_micros() as i64);
+                        [0, 1].map(|i| prev.1[i] + ((last.1[i] - prev.1[i]) as i64 * into / span) as i32)
+                    };
+                    hold = [cum[0] - target[0], cum[1] - target[1]];
+                }
+                let mut part = [0i8; 4];
+                for i in 0..4 {
+                    let want = if i < 2 { a[i] - hold[i] } else { a[i] };
+                    // Never send past what is pending, nor backwards
+                    let want = if a[i] >= 0 { want.clamp(0, a[i]) } else { want.clamp(a[i], 0) };
+                    part[i] = want.clamp(-127, 127) as i8;
+                    a[i] -= part[i] as i32;
+                }
+                if part == [0; 4] && *a != [0; 4] {
+                    // Everything pending is still held back: look again shortly
+                    next_mouse = embassy_time::Instant::now() + embassy_time::Duration::from_millis(2);
+                    break;
+                }
+                let r = Report::MouseReport(usbd_hid::descriptor::MouseReport {
+                    buttons: *b,
+                    x: part[0],
+                    y: part[1],
+                    wheel: part[2],
+                    pan: part[3],
+                });
+                if *a == [0; 4] {
+                    acc = None;
+                }
+                let s = embassy_time::Instant::now();
+                if let Err(e) = ble_hid_server.write_report(&r).await {
+                    error!("Failed to send report: {:?}", e);
+                }
+                // Pace no faster than 15 ms even when the host grants 7.5 ms: at 7.5 ms Windows
+                // still skips connection events in bursts and the queue fills again. A write that
+                // had to wait means the queue is already full, so skip the next slot as well.
+                let pace = conn.raw().params().conn_interval.max(embassy_time::Duration::from_millis(15));
+                let waited = s.elapsed() > embassy_time::Duration::from_millis(2);
+                next_mouse = embassy_time::Instant::now() + if waited { pace * 2 } else { pace };
+                if !flush_all {
+                    break;
+                }
+            }
+            if let Some(report) = after {
+                if let Report::MouseReport(m) = report {
+                    acc = Some((m.buttons, [m.x as i32, m.y as i32, m.wheel as i32, m.pan as i32]));
+                    let now = embassy_time::Instant::now();
+                    cum = [m.x as i32, m.y as i32];
+                    prev = (now - LAG, [0, 0]);
+                    last = (now, cum);
+                } else {
+                    if let Err(e) = ble_hid_server.write_report(&report).await {
+                        error!("Failed to send report: {:?}", e);
+                    }
+                }
             }
         }
     };
