@@ -1,0 +1,229 @@
+{
+  "name": "Madula RMK",
+  "vendorId": "0x4C4B",
+  "productId": "0x4643",
+  "lighting": "none",
+  "matrix": {
+    "rows": 5,
+    "cols": 14
+  },
+  "customKeycodes": [
+    {
+      "name": "BT0",
+      "title": "Bluetooth Channel 0",
+      "shortName": "BT0"
+    },
+    {
+      "name": "BT1",
+      "title": "Bluetooth Channel 1",
+      "shortName": "BT1"
+    },
+    {
+      "name": "BT2",
+      "title": "Bluetooth Channel 2",
+      "shortName": "BT2"
+    },
+    {
+      "name": "NEXT_BT",
+      "title": "Switch to the next Bluetooth channel",
+      "shortName": "Next\nBT"
+    },
+    {
+      "name": "PREV_BT",
+      "title": "Switch to the previous Bluetooth channel",
+      "shortName": "Prev\nBT"
+    },
+    {
+      "name": "CLR_BT",
+      "title": "Clear bond info for current channel",
+      "shortName": "Clear\nBT"
+    },
+    {
+      "name": "SWITCH",
+      "title": "Switch default output mode between USB/BLE",
+      "shortName": "Switch\nOutput"
+    },
+    {
+      "name": "CLR_PEER",
+      "title": "Forget the current bonded split peer(central or peripheral)",
+      "shortName": "Clear\nPeer"
+    },
+    {
+      "name": "USER08",
+      "title": "User 8 (unused)",
+      "shortName": "User\n8"
+    },
+    {
+      "name": "USER09",
+      "title": "User 9 (unused)",
+      "shortName": "User\n9"
+    },
+    {
+      "name": "USER10",
+      "title": "User 10 (unused)",
+      "shortName": "User\n10"
+    },
+    {
+      "name": "USER11",
+      "title": "User 11 (unused)",
+      "shortName": "User\n11"
+    },
+    {
+      "name": "USER12",
+      "title": "User 12 (unused)",
+      "shortName": "User\n12"
+    },
+    {
+      "name": "USER13",
+      "title": "User 13 (unused)",
+      "shortName": "User\n13"
+    },
+    {
+      "name": "USER14",
+      "title": "User 14 (unused)",
+      "shortName": "User\n14"
+    },
+    {
+      "name": "USER15",
+      "title": "User 15 (unused)",
+      "shortName": "User\n15"
+    },
+    {
+      "name": "USER16",
+      "title": "User 16 (unused)",
+      "shortName": "User\n16"
+    },
+    {
+      "name": "USER17",
+      "title": "User 17 (unused)",
+      "shortName": "User\n17"
+    },
+    {
+      "name": "USER18",
+      "title": "User 18 (unused)",
+      "shortName": "User\n18"
+    },
+    {
+      "name": "USER19",
+      "title": "User 19 (unused)",
+      "shortName": "User\n19"
+    },
+    {
+      "name": "DIAL_CW",
+      "title": "Dial: rotate clockwise",
+      "shortName": "Dial\n↻"
+    },
+    {
+      "name": "DIAL_CCW",
+      "title": "Dial: rotate counter-clockwise",
+      "shortName": "Dial\n↺"
+    },
+    {
+      "name": "DIAL_BTN",
+      "title": "Dial: press",
+      "shortName": "Dial\nPress"
+    }
+  ],
+  "layouts": {
+    "keymap": [
+      [
+        {
+          "x": 0.5
+        },
+        "0,0\n\n\n\n\n\n\n\n\ne",
+        "0,1\n\n\n\n\n\n\n\n\ne",
+        {
+          "x": 10
+        },
+        "1,0\n\n\n\n\n\n\n\n\ne",
+        "1,1\n\n\n\n\n\n\n\n\ne"
+      ],
+      [
+        "0,0",
+        "0,1",
+        "0,2",
+        "0,3",
+        "0,4",
+        "0,5",
+        {
+          "x": 2
+        },
+        "0,7",
+        "0,8",
+        "0,9",
+        "0,10",
+        "0,11",
+        "0,12"
+      ],
+      [
+        "1,0",
+        "1,1",
+        "1,2",
+        "1,3",
+        "1,4",
+        "1,5",
+        {
+          "x": 2
+        },
+        "1,7",
+        "1,8",
+        "1,9",
+        "1,10",
+        "1,11",
+        "1,12",
+        "1,13"
+      ],
+      [
+        "2,0",
+        "2,1",
+        "2,2",
+        "2,3",
+        "2,4",
+        "2,5",
+        "2,6",
+        {
+          "x": 1
+        },
+        "2,7",
+        "2,8",
+        "2,9",
+        "2,10",
+        "2,11",
+        "2,12"
+      ],
+      [
+        "3,0",
+        "3,1",
+        "3,2",
+        "3,3",
+        "3,4",
+        "3,5",
+        {
+          "x": 2
+        },
+        "3,7",
+        "3,8",
+        "3,9",
+        "3,10",
+        "3,11",
+        "3,12"
+      ],
+      [
+        {
+          "y": 0.5,
+          "x": 4.0
+        },
+        "4,0",
+        "4,1",
+        "4,2",
+        "4,3",
+        "4,4",
+        "4,5",
+        "4,6",
+        "4,7",
+        "4,8",
+        "4,9"
+      ]
+    ]
+  }
+}
