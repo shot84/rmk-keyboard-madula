@@ -5,7 +5,7 @@ edition = "2024"
 publish = false
 
 [dependencies]
-rmk = { version = "=0.9.0", default-features = false, features = ["usb_log", "storage", "watchdog", "nrf52840_ble", "split", "async_matrix", "adafruit_bl"] }
+rmk = { version = "=0.9.0", default-features = false, features = ["usb_log", "storage", "watchdog", "nrf52840_ble", "split", "async_matrix", "adafruit_bl", "vial"] }
 # Limit USB log traffic even in optimized diagnostic builds.
 log = { version = "0.4", features = ["max_level_debug", "release_max_level_debug"] }
 nrf-sdc = { version = "0.4.0", features = ["defmt", "peripheral", "central", "nrf52840"] }
@@ -21,6 +21,10 @@ defmt-rtt = "1"
 panic-probe = { package = "madula-boot-panic", path = "diagnostics/boot-panic" }
 static_cell = "2"
 embassy-usb-logger = { version = "0.6.0", features = ["nrf52840-adafruit-reset"] }
+
+[build-dependencies]
+# Compresses vial.json into the firmware for Vial
+xz2 = "0.1"
 
 [features]
 boot-audit = ["panic-probe/boot-recovery"]

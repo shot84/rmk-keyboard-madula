@@ -89,7 +89,8 @@ start_addr = 0xE0000
 num_sectors = 16
 
 [host]
-vial_enabled = false
+# Keymap editing from Vial (vial.rocks or the Vial app); layout in vial.json.
+vial_enabled = true
 
 [ble]
 enabled = true

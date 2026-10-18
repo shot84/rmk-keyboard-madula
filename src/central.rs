@@ -33,14 +33,17 @@ mod keyboard_central {
             },
         );
         let mut dial = crate::radial_controller::RadialController;
-        let mut usb_transport = rmk::usb::UsbTransport::new(driver, rmk_config.device_config);
+        // The generated entry attaches Vial to both transports; this override has to do it too
+        let mut usb_transport = rmk::usb::UsbTransport::new(driver, rmk_config.device_config)
+            .with_host_service(&host_service);
         let mut ble_transport = rmk::ble::BleTransport::new(
             ble_controller, ble_addr, rmk_config,
             [
                 rmk::split::PeripheralMatrixConfig { rows: 4, cols: 7, row_offset: 0, col_offset: 0 },
                 rmk::split::PeripheralMatrixConfig { rows: 4, cols: 7, row_offset: 0, col_offset: 7 },
             ],
-        );
+        )
+        .with_host_service(&host_service);
         let mut wpm = rmk::processor::builtin::wpm::WpmProcessor::new();
         rmk::run_all!(matrix, storage, keyboard, usb_transport, ble_transport,
                       wpm, watchdog_runner, pointer, dial).await;
