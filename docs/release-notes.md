@@ -1,3 +1,21 @@
+# Cornix + Madula — RMK firmware, review build by shot84 (not official)
+
+Based on te9no/rmk-keyboard-madula v0.1.0-rc.4 (`feb351c`), branch `review-daily`.
+See the README of this branch for what changed and why (Japanese).
+
+- BLE mouse reports are merged, paced to the connection interval (15 ms or slower)
+  and interpolated 8 ms back: the LPPS no longer lags over BLE on macOS or Windows.
+- The Dial CCCD is stored, so the Dial keeps working after a bonded reconnect.
+- Vial keymap editing (vial.rocks / Vial app).
+- My own 8-layer keymap with the left wheel reversed.
+- Per-second diagnostics on the USB log only.
+
+**Switching between builds with and without Vial clears pairings and the stored keymap.**
+The trackball and touchpad builds are untested on hardware.
+Cornix peripherals were left on rc.4 during testing.
+
+---
+
 # Cornix + Madula — RMK experimental firmware
 
 ## v0.1.0-rc.4
