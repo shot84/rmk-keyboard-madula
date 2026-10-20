@@ -19,6 +19,8 @@ Cornix peripherals were left on rc.4 during testing.
 
 ---
 
+*Below: te9no's original rc.4 release notes, unchanged. "User" in them refers to te9no's side, not shot84.*
+
 # Cornix + Madula — RMK experimental firmware
 
 ## v0.1.0-rc.4
