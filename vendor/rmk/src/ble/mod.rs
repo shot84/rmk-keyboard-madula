@@ -543,8 +543,6 @@ async fn gatt_events_task(server: &Server<'_>, conn: &GattConnection<'_, '_, Def
                             || event.handle() == mouse.cccd_handle.expect("No CCCD for mouse report")
                             || event.handle() == media.cccd_handle.expect("No CCCD for media report")
                             || event.handle() == system_control.cccd_handle.expect("No CCCD for system report")
-                            // A bonded peer's CCCDs are kept by the server, so the host does not write the
-                            // Dial subscription again on reconnect; without this it was never stored
                             || event.handle() == radial.cccd_handle.expect("No CCCD for radial report")
                             || event.handle() == level.cccd_handle.expect("No CCCD for battery level")
                             || {
