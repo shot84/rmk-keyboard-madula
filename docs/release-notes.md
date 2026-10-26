@@ -17,7 +17,8 @@ See the README of this branch for what changed and why (Japanese).
   3 frames and dropped at lift (the jump when the finger rolls off was no longer felt), chip XY
   filter bottom beta 40, tap-drag, three-finger swipe (four keys, assignable in Vial; Ctrl+arrows
   for macOS by default, set your own on Windows) or three-finger drag, and tuning keys in Vial
-  (RAM only). Used on macOS; tap-drag is untested on hardware and swipe is untested on Windows.
+  (RAM only). Used on macOS; tap-drag is untested on hardware. On Windows the swipe keys arrive, but the
+  default Ctrl+arrows act as plain Ctrl+arrows there.
   If you already used a Vial build, the stored keymap is kept and the four swipe keys stay
   empty: assign them in Vial.
 
