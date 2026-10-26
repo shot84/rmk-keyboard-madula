@@ -164,9 +164,9 @@ pub async fn run(bus: Twim<'static>, ready: Input<'static>) {
                     }
                     for axis in 0..2 {
                         let value = output.scroll[axis];
-                        // Preserve the existing Madula vertical scroll direction.
+                        // Vertical sign follows the ZMK driver (REL_WHEEL = +scroll_y).
                         let col = if axis == 0 { if value < 0 {8} else {9} }
-                                  else if value < 0 {6} else {7};
+                                  else if value > 0 {6} else {7};
                         for _ in 0..value.unsigned_abs() { tap_virtual(col).await; }
                     }
                     if dx != 0 || dy != 0 {
