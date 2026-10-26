@@ -10,11 +10,21 @@ See the README of this branch for what changed and why (Japanese).
 - Vial keymap editing (vial.rocks / Vial app).
 - My own 8-layer keymap with the left wheel reversed.
 - Per-second diagnostics on the USB log only.
+- Touchpad (`madula-iqs`): finger count from the trackpad flags with a 30 ms lift debounce
+  (repeated middle clicks from a resting three-finger touch not seen since on macOS), ZMK's
+  two/three-finger tap limits, vertical scroll sign as in the ZMK driver (natural on macOS;
+  feels reversed on Windows, as with the LPPS), full-speed cursor, one-finger motion held
+  3 frames and dropped at lift (the jump when the finger rolls off was no longer felt), chip XY
+  filter bottom beta 40, tap-drag, three-finger swipe (four keys, assignable in Vial; Ctrl+arrows
+  for macOS by default, set your own on Windows) or three-finger drag, and tuning keys in Vial
+  (RAM only). Used on macOS; tap-drag is untested on hardware and swipe is untested on Windows.
+  If you already used a Vial build, the stored keymap is kept and the four swipe keys stay
+  empty: assign them in Vial.
 
 **Switching between builds with and without Vial clears pairings and the stored keymap**
 (seen going from without to with Vial; the other way is expected to do the same).
 Vial is always unlocked (no host lock): any connected computer can rewrite the keymap.
-The trackball and touchpad builds are untested on hardware.
+The trackball build is untested on hardware.
 Cornix peripherals were left on rc.4 during testing.
 
 ---
