@@ -72,7 +72,7 @@ jobs:
           path: dist
           merge-multiple: true
       - name: Include editor definitions and setup guides
-        run: cp madula-vial.json vial.json rynk-compat.json docs/rynk.md docs/vial-web.md dist/
+        run: cp madula-vial.json vial.json rynk-compat.json docs/rynk.md docs/vial-web.md docs/input-enhancements.md dist/
       - name: Checksums
         working-directory: dist
         run: sha256sum *.uf2 *.elf *.json *.md > SHA256SUMS

@@ -1,17 +1,41 @@
-# v0.1.0-rc.6 — Fix RMK GUI protocol mismatch
+# v0.1.0-rc.7 — Dial再接続・BLE入力・IQSジェスチャー改善
 
-Fixes “firmware speaks v0.1, this tool speaks v0.2” when connecting the Rynk variants to https://gui.rmk.rs.
+shot84さんの修正を機能単位で取り込みました。
 
-- Flash `madula-lpps-rynk.uf2`, `madula-tb-rynk.uf2`, or `madula-iqs-rynk.uf2`, matching your installed input module.
-- Backports the exact Rynk v0.2 wire types used by RMK GUI (RMK revision `933b0630a23393961e5b3bfa7a176a68d9bb8b8c`), including capabilities and whole-macro requests.
-- Retains the existing storage schema, keymap, pairing format, LEDs, and Dial support. Existing RMK peripheral firmware can remain installed.
-- Macro conversion supports ordinary HID Tap/Press/Release, ASCII characters, and Delay up to 65024 ms. Up to 32 operations per macro and 32 slots, within the existing shared buffer. Unsupported extended actions/PauseForRelease and overflow are rejected without overwriting macros. Existing extended or longer Vial macros must be edited with Vial.
-- Files without the `-rynk` suffix are Vial builds.
+- [PR #1](https://github.com/te9no/rmk-keyboard-madula/pull/1): DialのBLE通知購読設定を保存し、再接続後に動かなくなる問題を修正。
+- BLEマウス報告を集約し、接続間隔（最低15ms）で送信。8ms前の移動を補間し、報告の滞留を抑制。
+- IQS9151の指本数判定・タップ誤検出対策、タップドラッグ、3本指スワイプ/ドラッグ、速度・フィルタ等の調整キーを追加。
+- 指離れ対策の切替時に古い移動が再出力される問題、フィルタ書き込み失敗時に再試行されない問題、保持バッファの最大深さでの範囲外アクセスを修正。
 
-Validation: deployed GUI WASM handshake, capabilities, identity, key and macro read/write, invalid-write preservation, BLE status decoding; protocol snapshots and adapter tests; firmware CI builds. The wire test uses a host test peer, not physical hardware. USB/BLE hardware operation and persistence after reboot remain unverified for this fix.
+## ファイルの選択
 
-[Connection instructions](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.6/docs/rynk.md)
+装着モジュールに合わせて中央機用UF2を選んでください。
 
-RMK GUI supports browser USB through WebUSB; the previous BLE-only guidance applied to upstream's reference demo. Rynk is experimental: other commits may use different formats even when labeled v0.2.
+| モジュール | Vial版 | Rynk版（gui.rmk.rs） |
+| --- | --- | --- |
+| LPPS | madula-lpps.uf2 | madula-lpps-rynk.uf2 |
+| PMW3610 / TB | madula-tb.uf2 | madula-tb-rynk.uf2 |
+| IQS9151 | madula-iqs.uf2 | madula-iqs-rynk.uf2 |
 
-UF2 images are RMK SDC applications at 0x1000 and overwrite legacy SoftDevice; they are not ZMK application updates. ELF files are for debugging. JSON manifests record source and hashes. SHA256SUMS covers release payloads. Device backups are never included.
+既存のRMK版Cornix左右はそのまま使用できます。CornixTPには専用のcornix-tp.uf2を使います。
+IQSのジェスチャー改善はMadula IQS版が対象です。
+
+## 設定・注意点
+
+- 元の5レイヤー・既存キー割り当て・スクロール方向・保存領域/スキーマID・ホストロック設定を維持。個人用配列やVial常時アンロックは取り込んでいません。
+- 3本指スワイプの仮想キー4個（上/下/左/右、行4列10〜13）は既定で未割り当てです。Vial/Rynkで割り当ててください。
+- IQSの既定値はカーソル等倍、フィルタbeta 40、指離れ対策3フレーム（約33ms）、タップドラッグ有効です。指離れ対策には遅延とのトレードオフがあります。
+- 調整値はRAMのみで、再起動すると既定値へ戻ります。
+- rc.6のRynk v0.2互換対応を維持。拡張Action/PauseForRelease等のマクロ制限も継続します。
+
+[操作・調整キー一覧](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.7/docs/input-enhancements.md) · [Rynk接続手順](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.7/docs/rynk.md)
+
+## 検証範囲
+
+設定テスト19件、IQSジェスチャー/回帰テスト24件、通信形式・マクロ互換性テスト、全9構成のCIビルドを実施。
+この統合版の実機USB/BLE操作、再接続、再起動後の保存確認は未実施です。
+
+元の機能改善: [4685a71](https://github.com/shot84/rmk-keyboard-madula/commit/4685a7121abcb4505efdd14697dd593d976b6570) / [c179589](https://github.com/shot84/rmk-keyboard-madula/commit/c179589c0780eed907638c606017f08afd70a9c5)
+
+UF2は0x1000から配置するRMK SDCアプリで、旧SoftDeviceを上書きします。ZMKアプリの更新ファイルではありません。
+ELFはデバッグ用、JSONはソースコミットとハッシュ、SHA256SUMSは配布物の検証用です。デバイスのバックアップは含みません。
