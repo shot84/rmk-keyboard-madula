@@ -1,3 +1,16 @@
+# v0.1.0-rc.5 — Madula Vial / Rynk
+
+Adds browser keymap editing builds for Madula LPPS, TB (PMW3610), and IQS9151.
+
+- `madula-{lpps,tb,iqs}.uf2`: Vial variants.
+- `madula-{lpps,tb,iqs}-rynk.uf2`: experimental Rynk variants; use BLE/WebHID for the reference browser client.
+- Choose the image matching your installed module and desired protocol. Vial and Rynk cannot be enabled together.
+- Cornix left/right peripheral images are included. CornixTP has its own central image.
+
+Rynk firmware builds are verified. Device flashing, browser editing, persistence after reboot, and the reference Web client build remain unverified for Madula Rynk. The Web client must be built locally at the pinned revision; this release does not host a Web editor.
+
+See [Rynk setup](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.5/docs/rynk.md) and [Vial Web setup](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.5/docs/vial-web.md). Setup documents and Vial definitions are included as release assets.
+
 # Cornix + Madula — RMK experimental firmware
 
 ## v0.1.0-rc.4
@@ -43,3 +56,11 @@ is a voltage-derived estimate. This is an experimental prerelease.
 
 ELF files are for debugging. Per-variant JSON records the source commit and
 hashes; `SHA256SUMS` verifies all payloads. Device backups are never included.
+
+## CornixTP experimental target
+
+`cornix-tp.uf2` targets the XIAO nRF52840 + TPS43 central; use it with the two Cornix peripheral images. Hardware validation is pending. See [CornixTP notes](cornix-tp.md). Do not use the Madula image on this wiring.
+
+CornixTP now includes Vial for keys, encoders and gesture bindings. USB/BLE transport integration and embedded layout are build-verified; device recognition and persistent editing still require hardware validation.
+
+Madula Rynk variants are available as madula-{lpps,tb,iqs}-rynk.uf2. These are experimental alternatives to Vial, with no hardware validation yet. See [Rynk setup](rynk.md).

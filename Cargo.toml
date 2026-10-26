@@ -22,15 +22,23 @@ panic-probe = { package = "madula-boot-panic", path = "diagnostics/boot-panic" }
 static_cell = "2"
 embassy-usb-logger = { version = "0.6.0", features = ["nrf52840-adafruit-reset"] }
 
+[build-dependencies]
+json = "=0.12.4"
+xz2 = "=0.1.7"
+
 [features]
 boot-audit = ["panic-probe/boot-recovery"]
 lpps = []
 pmw3610 = []
 iqs9151 = []
+cornix-tp = ["rmk/vial", "rmk/host_lock"]
+madula-vial = ["rmk/vial", "rmk/host_lock"]
+madula-rynk = ["rmk/rynk"]
 battery-audit = []
 led-self-test = []
 
 [patch.crates-io]
+rmk-macro = { path = "vendor/rmk-macro" }
 rmk = { path = "vendor/rmk" }
 embassy-usb-logger = { path = "vendor/embassy-usb-logger" }
 
@@ -43,6 +51,11 @@ path = "src/left.rs"
 [[bin]]
 name = "cornix-right"
 path = "src/right.rs"
+
+[[bin]]
+name = "cornix-tp"
+path = "src/cornix_tp.rs"
+required-features = ["cornix-tp"]
 
 [[bin]]
 name = "xiao-ble-init"

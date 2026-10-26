@@ -1383,6 +1383,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "json"
+version = "0.12.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "078e285eafdfb6c4b434e0d31e8cfcb5115b651496faca5749b88fafd4f23bfd"
+
+[[package]]
 name = "json5"
 version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1446,6 +1452,17 @@ dependencies = [
  "scoped-tls",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "lzma-sys"
+version = "0.1.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fda04ab3764e6cde78b9974eec4f779acaba7c4e84b36eca3cf77c581b85d27"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
 ]
 
 [[package]]
@@ -1768,6 +1785,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 
 [[package]]
+name = "pkg-config"
+version = "0.3.34"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
+
+[[package]]
 name = "portable-atomic"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1924,6 +1947,7 @@ name = "rmk"
 version = "0.9.0"
 dependencies = [
  "bt-hci",
+ "byteorder",
  "cortex-m",
  "crc32fast",
  "document-features",
@@ -1984,19 +2008,19 @@ dependencies = [
  "embassy-nrf",
  "embassy-time",
  "embassy-usb-logger",
+ "json",
  "log",
  "madula-boot-panic",
  "nrf-mpsl",
  "nrf-sdc",
  "rmk",
  "static_cell",
+ "xz2",
 ]
 
 [[package]]
 name = "rmk-macro"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f05e892c029cb74391b82156ef77c09157d6b4ec169d476415d56f75f7c244d5"
 dependencies = [
  "cargo_toml",
  "darling 0.24.1",
@@ -2016,6 +2040,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e99d79529fd045848d7692504eb733fb4dd7407f2ba1cf11397508cc68125140"
 dependencies = [
  "bitfield-struct",
+ "cobs",
  "heapless 0.9.3",
  "postcard",
  "rmk-config",
@@ -2748,6 +2773,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b97319f7b8343df12cc98938e5c3eb436064524c8d2b4e30a1d3a36eecdf81"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "xz2"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "388c44dc09d76f1536602ead6d325eb532f5c122f17782bd57fb47baeeb767e2"
+dependencies = [
+ "lzma-sys",
 ]
 
 [[package]]

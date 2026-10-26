@@ -1,5 +1,7 @@
 #![no_main]
 #![no_std]
+#[cfg(feature = "cornix-tp")]
+compile_error!("Build --bin cornix-tp for the CornixTP central");
 use rmk::macros::rmk_central;
 #[cfg(feature = "lpps")]
 mod lpps;
@@ -34,6 +36,8 @@ mod keyboard_central {
         );
         let mut dial = crate::radial_controller::RadialController;
         let mut usb_transport = rmk::usb::UsbTransport::new(driver, rmk_config.device_config);
+        #[cfg(any(feature = "madula-vial", feature = "madula-rynk"))]
+        let mut usb_transport = usb_transport.with_host_service(&host_service);
         let mut ble_transport = rmk::ble::BleTransport::new(
             ble_controller, ble_addr, rmk_config,
             [
@@ -41,6 +45,8 @@ mod keyboard_central {
                 rmk::split::PeripheralMatrixConfig { rows: 4, cols: 7, row_offset: 0, col_offset: 7 },
             ],
         );
+        #[cfg(any(feature = "madula-vial", feature = "madula-rynk"))]
+        let mut ble_transport = ble_transport.with_host_service(&host_service);
         let mut wpm = rmk::processor::builtin::wpm::WpmProcessor::new();
         rmk::run_all!(matrix, storage, keyboard, usb_transport, ble_transport,
                       wpm, watchdog_runner, pointer, dial).await;

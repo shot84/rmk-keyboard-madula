@@ -107,7 +107,7 @@ class BringupConfig(unittest.TestCase):
         self.assertNotIn("defmt", rmk["features"])
         self.assertIn("release_max_level_debug", manifest["dependencies"]["log"]["features"])
         self.assertEqual({binary["name"] for binary in manifest["bin"]},
-                         {"madula-central", "cornix-left", "cornix-right", "xiao-ble-init"})
+                         {"madula-central", "cornix-left", "cornix-right", "cornix-tp", "xiao-ble-init"})
 
 
 if __name__ == "__main__":

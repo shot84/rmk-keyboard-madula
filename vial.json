@@ -1,0 +1,554 @@
+{
+  "name": "CornixTP RMK",
+  "vendorId": "0x4C4B",
+  "productId": "0x4643",
+  "lighting": "none",
+  "matrix": {
+    "rows": 5,
+    "cols": 14
+  },
+  "customKeycodes": [
+    {
+      "name": "User0",
+      "title": "RMK User0",
+      "shortName": "User0"
+    },
+    {
+      "name": "User1",
+      "title": "RMK User1",
+      "shortName": "User1"
+    },
+    {
+      "name": "User2",
+      "title": "RMK User2",
+      "shortName": "User2"
+    },
+    {
+      "name": "User3",
+      "title": "RMK User3",
+      "shortName": "User3"
+    },
+    {
+      "name": "User4",
+      "title": "RMK User4",
+      "shortName": "User4"
+    },
+    {
+      "name": "User5",
+      "title": "RMK User5",
+      "shortName": "User5"
+    },
+    {
+      "name": "User6",
+      "title": "RMK User6",
+      "shortName": "User6"
+    },
+    {
+      "name": "User7",
+      "title": "RMK User7",
+      "shortName": "User7"
+    },
+    {
+      "name": "User8",
+      "title": "RMK User8",
+      "shortName": "User8"
+    },
+    {
+      "name": "User9",
+      "title": "RMK User9",
+      "shortName": "User9"
+    },
+    {
+      "name": "User10",
+      "title": "RMK User10",
+      "shortName": "User10"
+    },
+    {
+      "name": "User11",
+      "title": "RMK User11",
+      "shortName": "User11"
+    },
+    {
+      "name": "User12",
+      "title": "RMK User12",
+      "shortName": "User12"
+    },
+    {
+      "name": "User13",
+      "title": "RMK User13",
+      "shortName": "User13"
+    },
+    {
+      "name": "User14",
+      "title": "RMK User14",
+      "shortName": "User14"
+    },
+    {
+      "name": "User15",
+      "title": "RMK User15",
+      "shortName": "User15"
+    },
+    {
+      "name": "User16",
+      "title": "RMK User16",
+      "shortName": "User16"
+    },
+    {
+      "name": "User17",
+      "title": "RMK User17",
+      "shortName": "User17"
+    },
+    {
+      "name": "User18",
+      "title": "RMK User18",
+      "shortName": "User18"
+    },
+    {
+      "name": "User19",
+      "title": "RMK User19",
+      "shortName": "User19"
+    },
+    {
+      "name": "User20",
+      "title": "Dial counter-clockwise",
+      "shortName": "Dial counter-clockwise"
+    },
+    {
+      "name": "User21",
+      "title": "Dial clockwise",
+      "shortName": "Dial clockwise"
+    },
+    {
+      "name": "User22",
+      "title": "Dial button",
+      "shortName": "Dial button"
+    },
+    {
+      "name": "User23",
+      "title": "RMK User23",
+      "shortName": "User23"
+    },
+    {
+      "name": "User24",
+      "title": "RMK User24",
+      "shortName": "User24"
+    },
+    {
+      "name": "User25",
+      "title": "RMK User25",
+      "shortName": "User25"
+    },
+    {
+      "name": "User26",
+      "title": "RMK User26",
+      "shortName": "User26"
+    },
+    {
+      "name": "User27",
+      "title": "RMK User27",
+      "shortName": "User27"
+    },
+    {
+      "name": "User28",
+      "title": "RMK User28",
+      "shortName": "User28"
+    },
+    {
+      "name": "User29",
+      "title": "RMK User29",
+      "shortName": "User29"
+    },
+    {
+      "name": "User30",
+      "title": "RMK User30",
+      "shortName": "User30"
+    },
+    {
+      "name": "User31",
+      "title": "RMK User31",
+      "shortName": "User31"
+    }
+  ],
+  "layouts": {
+    "keymap": [
+      [
+        {
+          "x": 0.0,
+          "y": 0.5
+        },
+        "0,0"
+      ],
+      [
+        {
+          "x": 1.0,
+          "y": -1.0
+        },
+        "0,1"
+      ],
+      [
+        {
+          "x": 2.0,
+          "y": -1.25
+        },
+        "0,2"
+      ],
+      [
+        {
+          "x": 3.0,
+          "y": -1.25
+        },
+        "0,3"
+      ],
+      [
+        {
+          "x": 4.0,
+          "y": -0.75
+        },
+        "0,4"
+      ],
+      [
+        {
+          "x": 5.0,
+          "y": -0.75
+        },
+        "0,5"
+      ],
+      [
+        {
+          "x": 8.5,
+          "y": -1.0
+        },
+        "0,12"
+      ],
+      [
+        {
+          "x": 9.5,
+          "y": -1.2
+        },
+        "0,11"
+      ],
+      [
+        {
+          "x": 10.5,
+          "y": -1.3
+        },
+        "0,10"
+      ],
+      [
+        {
+          "x": 11.5,
+          "y": -0.67
+        },
+        "0,9"
+      ],
+      [
+        {
+          "x": 12.5,
+          "y": -0.83
+        },
+        "0,8"
+      ],
+      [
+        {
+          "x": 13.5,
+          "y": -1.0
+        },
+        "0,7"
+      ],
+      [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "1,0"
+      ],
+      [
+        {
+          "x": 1.0,
+          "y": -1.0
+        },
+        "1,1"
+      ],
+      [
+        {
+          "x": 2.0,
+          "y": -1.25
+        },
+        "1,2"
+      ],
+      [
+        {
+          "x": 3.0,
+          "y": -1.25
+        },
+        "1,3"
+      ],
+      [
+        {
+          "x": 4.0,
+          "y": -0.75
+        },
+        "1,4"
+      ],
+      [
+        {
+          "x": 5.0,
+          "y": -0.75
+        },
+        "1,5"
+      ],
+      [
+        {
+          "x": 8.5,
+          "y": -1.0
+        },
+        "1,12"
+      ],
+      [
+        {
+          "x": 9.5,
+          "y": -1.2
+        },
+        "1,11"
+      ],
+      [
+        {
+          "x": 10.5,
+          "y": -1.3
+        },
+        "1,10"
+      ],
+      [
+        {
+          "x": 11.5,
+          "y": -0.67
+        },
+        "1,9"
+      ],
+      [
+        {
+          "x": 12.5,
+          "y": -0.83
+        },
+        "1,8"
+      ],
+      [
+        {
+          "x": 13.5,
+          "y": -1.0
+        },
+        "1,7"
+      ],
+      [
+        {
+          "x": 0.0,
+          "y": 0.05
+        },
+        "2,0"
+      ],
+      [
+        {
+          "x": 1.0,
+          "y": -1.0
+        },
+        "2,1"
+      ],
+      [
+        {
+          "x": 2.0,
+          "y": -1.3
+        },
+        "2,2"
+      ],
+      [
+        {
+          "x": 3.0,
+          "y": -1.25
+        },
+        "2,3"
+      ],
+      [
+        {
+          "x": 4.0,
+          "y": -0.75
+        },
+        "2,4"
+      ],
+      [
+        {
+          "x": 5.0,
+          "y": -0.7
+        },
+        "2,5"
+      ],
+      [
+        {
+          "x": 6.0,
+          "y": -1.55
+        },
+        "2,6"
+      ],
+      [
+        {
+          "x": 7.5,
+          "y": -1.0
+        },
+        "1,13"
+      ],
+      [
+        {
+          "x": 8.5,
+          "y": -0.45
+        },
+        "2,12"
+      ],
+      [
+        {
+          "x": 9.5,
+          "y": -1.25
+        },
+        "2,11"
+      ],
+      [
+        {
+          "x": 10.5,
+          "y": -1.3
+        },
+        "2,10"
+      ],
+      [
+        {
+          "x": 11.5,
+          "y": -0.67
+        },
+        "2,9"
+      ],
+      [
+        {
+          "x": 12.5,
+          "y": -0.78
+        },
+        "2,8"
+      ],
+      [
+        {
+          "x": 13.5,
+          "y": -1.0
+        },
+        "2,7"
+      ],
+      [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "3,0"
+      ],
+      [
+        {
+          "x": 1.0,
+          "y": -1.0
+        },
+        "3,1"
+      ],
+      [
+        {
+          "x": 2.0,
+          "y": -1.25
+        },
+        "3,2"
+      ],
+      [
+        {
+          "x": 3.5,
+          "y": -0.67
+        },
+        "3,3"
+      ],
+      [
+        {
+          "x": 4.5,
+          "y": -0.93
+        },
+        "3,4"
+      ],
+      [
+        {
+          "x": 5.5,
+          "y": -1.05
+        },
+        "3,5"
+      ],
+      [
+        {
+          "x": 7.640000000000001,
+          "y": 0.73
+        },
+        "3,12"
+      ],
+      [
+        {
+          "x": 9.0,
+          "y": -2.63
+        },
+        "3,11"
+      ],
+      [
+        {
+          "x": 10.0,
+          "y": -1.12
+        },
+        "3,10"
+      ],
+      [
+        {
+          "x": 11.5,
+          "y": -1.25
+        },
+        "3,9"
+      ],
+      [
+        {
+          "x": 12.5,
+          "y": -0.83
+        },
+        "3,8"
+      ],
+      [
+        {
+          "x": 13.5,
+          "y": -1.0
+        },
+        "3,7"
+      ],
+      [
+        {
+          "x": 0.0,
+          "y": 1.25
+        },
+        "0,0\n\n\n\n\n\n\n\n\ne",
+        "0,1\n\n\n\n\n\n\n\n\ne"
+      ],
+      [
+        {
+          "x": 8.5,
+          "y": -1.0
+        },
+        "1,0\n\n\n\n\n\n\n\n\ne",
+        "1,1\n\n\n\n\n\n\n\n\ne"
+      ],
+      [
+        {
+          "y": 0.4,
+          "x": 1
+        },
+        "4,3",
+        "4,4",
+        "4,6",
+        "4,7",
+        "4,8",
+        "4,9"
+      ]
+    ]
+  }
+}

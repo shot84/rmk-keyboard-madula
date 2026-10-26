@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [cornix-left, cornix-right, madula-lpps, madula-tb, madula-iqs]
+        target: [cornix-left, cornix-right, madula-lpps, madula-tb, madula-iqs, cornix-tp, madula-lpps-rynk, madula-tb-rynk, madula-iqs-rynk]
     steps:
       - uses: actions/checkout@v4
       - name: Install toolchain
@@ -36,6 +36,8 @@ jobs:
           /tmp/pwm-tests
           rustc +1.94.1 --test src/radial_report.rs -o /tmp/dial-tests
           /tmp/dial-tests
+          rustc +1.94.1 --test src/tps43_frame.rs -o /tmp/tps43-tests
+          /tmp/tps43-tests
       - name: Build and package
         env:
           CC_thumbv7em_none_eabihf: arm-none-eabi-gcc
@@ -59,9 +61,11 @@ jobs:
           pattern: firmware-*
           path: dist
           merge-multiple: true
+      - name: Include editor definitions and setup guides
+        run: cp madula-vial.json vial.json docs/rynk.md docs/vial-web.md dist/
       - name: Checksums
         working-directory: dist
-        run: sha256sum *.uf2 *.elf *.json > SHA256SUMS
+        run: sha256sum *.uf2 *.elf *.json *.md > SHA256SUMS
       - name: Create draft prerelease
         env:
           GH_TOKEN: ${{ github.token }}

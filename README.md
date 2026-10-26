@@ -24,6 +24,16 @@ Cornix左右をBLEでMadulaへ接続し、MadulaからPCへ入力を送ります
 RMK 0.9.0を使用し、依存関係は`Cargo.lock`で固定しています。
 USB/BLEホスト接続に対応する構成ですが、BLEホスト接続を含む全条件での検証完了を示すものではありません。
 
+## CornixTP / TPS43
+
+CornixTP用の独立した中央機ターゲットを追加しました。Vialでキー・エンコーダー・ジェスチャーの割り当てを編集できます。
+[配線・機能・ビルド方法](docs/cornix-tp.md)を参照してください。実機動作は未確認です。
+
+## Rynk（実験版）
+
+Madula向けにRynk版も追加しました。[ビルドとWebツールの手順](docs/rynk.md)を参照してください。
+Vial版とは別のUF2で、ブラウザー接続はBLE経由です。実機検証は未実施です。
+
 ## 入力モジュール
 
 | モジュール | 操作 | 配布状況 |
@@ -98,7 +108,7 @@ DialのUSB/BLEレポートと送信経路を追加しています。
 CornixのMadula用キーマップを基準に、base / func / num / bt / naviの5レイヤーを保持しています。
 変更後は再ビルドが必要です。
 
-- **DYA Studio・Vialによる編集は非対応**です。
+- Madulaは**Vial Webでの編集に対応するビルド**を追加しました。[Web編集の手順](docs/vial-web.md)を参照してください。DYA Studioは非対応です。
 - ZMKのLayoutShiftとBTプロファイル操作は未移植で、該当位置は無効にしています。
 - naviへの到達キーは現在の標準割り当てにありません。
 
@@ -141,9 +151,9 @@ python3 -m unittest discover -s tests
 cargo +1.94.1 build --release --locked --bin cornix-left --bin cornix-right
 
 # Madula：装着モジュールに合わせて1つ選択
-cargo +1.94.1 build --release --locked --bin madula-central --features lpps,battery-audit
-cargo +1.94.1 build --release --locked --bin madula-central --features pmw3610,battery-audit
-cargo +1.94.1 build --release --locked --bin madula-central --features iqs9151,battery-audit
+cargo +1.94.1 build --release --locked --bin madula-central --features lpps,battery-audit,madula-vial
+cargo +1.94.1 build --release --locked --bin madula-central --features pmw3610,battery-audit,madula-vial
+cargo +1.94.1 build --release --locked --bin madula-central --features iqs9151,battery-audit,madula-vial
 ```
 
 `lpps` / `pmw3610` / `iqs9151`は同時に有効化できません。
