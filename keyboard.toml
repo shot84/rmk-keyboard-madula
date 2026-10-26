@@ -16,14 +16,14 @@ map = """
 (2,0) (2,1) (2,2) (2,3) (2,4) (2,5) (2,6) (1,13) (2,12) (2,11) (2,10) (2,9) (2,8) (2,7)
 (3,0) (3,1) (3,2) (3,3) (3,4) (3,5)             (3,12) (3,11) (3,10) (3,9) (3,8) (3,7)
 (4,0) (4,1) (4,2)
-(4,3) (4,4) (4,5) (4,6) (4,7) (4,8) (4,9)
+(4,3) (4,4) (4,5) (4,6) (4,7) (4,8) (4,9) (4,10) (4,11) (4,12) (4,13)
 """
 
 [keymap]
 layers = 5
 # Source: te9no/zmk-keyboard-cornix config/madula.keymap @ 1ca9112
 # Layer order: base, func, num, bt, navi.
-# Row 4 columns 3..9 are virtual IQS gesture keys, not physical switches.
+# Row 4 columns 3..9 are taps/scroll; 10..13 are unassigned IQS swipes (up/down/left/right).
 
 [[keymap.layer]]
 encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
@@ -33,7 +33,7 @@ LT(3,Escape) A S D F G            H J K L Backslash Enter
 LShift Z X C V B No User22      N M Comma Dot Up Slash
 MT(Escape,LCtrl) LGui LAlt LT(1,Space) LT(2,Space) Backspace Language1 Language2 No Left Down Right
 MouseBtn1 MouseBtn3 MouseBtn2
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
 """
 
 [[keymap.layer]]
@@ -44,7 +44,7 @@ _ Left Down Right _ _            F6 F7 F8 F9 F10 _
 _ Backspace Delete Home End _ _ User22 F11 F12 Semicolon Quote _ _
 No No No _ _ Backspace           _ _ _ No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
 """
 
 [[keymap.layer]]
@@ -56,7 +56,7 @@ No _ _ _ _ _                    Minus Equal LeftBracket RightBracket Backslash _
 _ Backspace Delete _ _ _ _ User22 _ Slash Semicolon Quote _ _
 No No No Enter No No            No No _ No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
 """
 
 [[keymap.layer]]
@@ -68,7 +68,7 @@ No _ _ _ _ _                    _ _ _ _ _ _
 No No No No No _ No User22     _ _ _ _ _ _
 No No No _ _ _                  No No _ No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
 """
 
 [[keymap.layer]]
@@ -81,7 +81,7 @@ No No MouseLeft MouseDown MouseRight MouseWheelUp Left Down Up Right No No
 No No No No No MouseWheelDown _ User22 _ _ No No No No
 No No No No _ _                 No No Kc5 No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
 """
 
 [storage]

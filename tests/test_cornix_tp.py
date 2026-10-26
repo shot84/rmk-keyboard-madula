@@ -15,7 +15,12 @@ class CornixTP(unittest.TestCase):
         tp = tomllib.loads((ROOT / "cornix-tp.toml").read_text())
         base = tomllib.loads((ROOT / "keyboard.toml").read_text())
         self.assertEqual(tp["split"]["peripheral"], base["split"]["peripheral"])
-        self.assertEqual(tp["layout"], base["layout"])
+        import re
+        self.assertEqual(tp["layout"]["rows"], base["layout"]["rows"])
+        self.assertEqual(tp["layout"]["cols"], base["layout"]["cols"])
+        tp_keys = re.findall(r"\(\d+,\d+\)", tp["layout"]["map"])
+        base_keys = re.findall(r"\(\d+,\d+\)", base["layout"]["map"])
+        self.assertEqual(base_keys, tp_keys + [f"(4,{i})" for i in range(10,14)])
         for layer in tp["keymap"]["layer"]:
             self.assertEqual(layer["keys"].split()[-7:], [
                 "MouseBtn1", "MouseBtn2", "MouseBtn3", "MouseWheelUp",

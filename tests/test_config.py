@@ -20,10 +20,10 @@ class BringupConfig(unittest.TestCase):
             self.assertFalse(used & region)
             used |= region
         mapped = re.findall(r"\((\d+),(\d+)\)", self.cfg["layout"]["map"])
-        virtual = {(4, c) for c in range(3, 10)}
+        virtual = {(4, c) for c in range(3, 14)}
         self.assertFalse(virtual & used)
-        self.assertEqual(len(mapped), 60)
-        self.assertEqual(len(set(mapped)), 60)
+        self.assertEqual(len(mapped), 64)
+        self.assertEqual(len(set(mapped)), 64)
         self.assertTrue({tuple(map(int, p)) for p in mapped} <= used | virtual)
 
     def test_source_pin_mapping(self):
@@ -43,10 +43,14 @@ class BringupConfig(unittest.TestCase):
         self.assertEqual(self.cfg["keymap"]["layers"], 5)
         self.assertEqual(len(self.cfg["keymap"]["layer"]), 5)
         for layer in self.cfg["keymap"]["layer"]:
-            self.assertEqual(len(layer["keys"].split()), 60)
-            self.assertEqual(layer["keys"].split()[-7:], [
+            self.assertEqual(len(layer["keys"].split()), 64)
+            self.assertEqual(layer["keys"].split()[-11:-4], [
                 "MouseBtn1", "MouseBtn2", "MouseBtn3", "MouseWheelUp",
                 "MouseWheelDown", "MouseWheelLeft", "MouseWheelRight"])
+
+    def test_swipes_start_unassigned(self):
+        for layer in self.cfg["keymap"]["layer"]:
+            self.assertEqual(layer["keys"].split()[-4:], ["No"] * 4)
 
     def test_ble_device_name_length(self):
         # RMK 0.9's BLE profile naming reserves space: max 22 UTF-8 bytes.

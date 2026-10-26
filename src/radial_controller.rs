@@ -15,6 +15,11 @@ impl Runnable for RadialController {
                 Action::User(20) if event.keyboard_event.pressed => 180,
                 Action::User(21) if event.keyboard_event.pressed => -180,
                 Action::User(22) => { button = event.keyboard_event.pressed; 0 }
+                #[cfg(feature = "iqs9151")]
+                Action::User(id) if event.keyboard_event.pressed => {
+                    if let Some(pulses) = crate::iqs9151_tune::adjust(id) { crate::status_led::pulse(pulses); }
+                    continue;
+                }
                 _ => continue,
             };
             rmk::channel::send_hid_report(

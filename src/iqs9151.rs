@@ -72,7 +72,8 @@ impl Sensor {
                            (0x11ea,30), (0x11ec,511), (0x11f6,0), (0x11f8,0)] {
             self.set(reg, val).await?;
         }
-        self.write(0x11ee, &[80]).await?;
+        // Bottom beta comes from the tuning keys (default 40; Madula ZMK uses 80) and can change at runtime.
+        self.write(0x11ee, &[crate::iqs9151_tune::current().filter_beta]).await?;
         log::info!("IQS9151 configuration written; starting TP ATI");
         // TP is sensed in active mode. ALP is only sensed in low-power modes;
         // waiting for its queued request here can block an otherwise ready TP.
@@ -98,7 +99,7 @@ impl Sensor {
         let info = self.word(0x1020).await?;
         log::info!("IQS9151 post-init info=0x{:04x}", info);
         if info & 0x80 != 0 { return Err(Error::Reset); }
-        log::info!("IQS9151 configured; half-speed pointer; 1/2/3-finger tap; 2-finger scroll");
+        log::info!("IQS9151 configured; tunable pointer; 1/2/3-finger tap; 2-finger scroll; 3-finger drag or swipe");
         Ok(())
     }
     async fn sample(&mut self) -> Result<gestures::Sample, Error> {
@@ -120,19 +121,50 @@ pub async fn run(bus: Twim<'static>, ready: Input<'static>) {
         let mut report = Instant::now();
         let mut sum = [0i32; 2];
         let mut gestures = gestures::Gestures::default();
+        let mut no_touch_bit = 0u32;
+        let mut left_down = false;
+        let mut beta = crate::iqs9151_tune::current().filter_beta;
         loop {
             match sensor.sample().await {
                 Ok(sample) => {
                     let fingers = sample.fingers;
-                    let output = gestures.update(sample, Instant::now().as_millis());
+                    if fingers != 0 && !sample.touch { no_touch_bit += 1; }
+                    let t = crate::iqs9151_tune::current();
+                    if t.filter_beta != beta {
+                        // Retry on the next sample if a transient write fails.
+                        if let Err(e) = sensor.write(0x11ee, &[t.filter_beta]).await {
+                            log::warn!("IQS9151 filter write failed: {:?}", e);
+                        } else {
+                            beta = t.filter_beta;
+                            log::info!("IQS9151 filter beta={}", beta);
+                        }
+                    }
+                    let params = gestures::Params { cursor_num: t.cursor_num, scroll_div: t.scroll_div,
+                        tap_ms: t.tap_ms, tap_drag: t.tap_drag, lift_hold: t.lift_hold, three_drag: t.three_drag };
+                    let now = Instant::now().as_millis();
+                    let output = gestures.update(sample, now, params);
                     let [dx, dy] = output.pointer;
+                    // Tap-drag and three-finger drag hold the left button (virtual column 3).
+                    if let Some(pressed) = output.left {
+                        log::info!("IQS9151 left={}", pressed);
+                        publish_event_async(KeyboardEvent::key(4, 3, pressed)).await;
+                        left_down = pressed;
+                    }
                     if output.tap != 0 {
                         log::info!("IQS9151 tap fingers={}", output.tap);
                         tap_virtual(2 + output.tap).await;
                     }
+                    if let Some(swipe) = output.swipe {
+                        // Swipes are virtual columns 10..13 (up, down, left, right) so each
+                        // direction can carry its own key in Vial (macOS and Windows differ). The
+                        // defaults follow the macOS trackpad: swiping left shows the Space to the
+                        // right (Ctrl+Right), up is Mission Control, down App Exposé.
+                        log::info!("IQS9151 swipe {:?}", swipe);
+                        tap_virtual(10 + swipe as u8).await;
+                    }
                     for axis in 0..2 {
                         let value = output.scroll[axis];
-                        // Positive sensor Y is downward; wheel-up is the opposite.
+                        // Preserve the existing Madula vertical scroll direction.
                         let col = if axis == 0 { if value < 0 {8} else {9} }
                                   else if value < 0 {6} else {7};
                         for _ in 0..value.unsigned_abs() { tap_virtual(col).await; }
@@ -146,12 +178,16 @@ pub async fn run(bus: Twim<'static>, ready: Input<'static>) {
                         sum[0] += i32::from(dx); sum[1] += i32::from(dy);
                     }
                     if report.elapsed().as_secs() >= 1 {
-                        log::info!("IQS9151 fingers={} delta_sum={:?}", fingers, sum);
+                        log::info!("IQS9151 fingers={} delta_sum={:?} bridged={} no_touch_bit={} gated={}",
+                            fingers, sum, gestures.bridged, no_touch_bit, gestures.gated);
+                        gestures.bridged = 0; no_touch_bit = 0; gestures.gated = 0;
                         sum = [0; 2]; report = Instant::now();
                     }
                 }
                 Err(e) => {
                     log::warn!("IQS9151 read failed: {:?}; output disabled", e);
+                    // Re-init drops the gesture state; never leave a tap-drag button down.
+                    if left_down { publish_event_async(KeyboardEvent::key(4, 3, false)).await; }
                     break;
                 }
             }
@@ -161,6 +197,7 @@ pub async fn run(bus: Twim<'static>, ready: Input<'static>) {
         Timer::after_secs(2).await;
     }
 }
+
 
 async fn tap_virtual(col: u8) {
     // Distinct virtual positions preserve physical Madula button bindings.

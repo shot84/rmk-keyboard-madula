@@ -21,7 +21,7 @@ class MadulaVial(unittest.TestCase):
                     re.findall(r"\((\d+),(\d+)\)", cfg["layout"]["map"])}
         self.assertEqual(len(keys), len(set(keys)))
         self.assertEqual(set(keys), expected)
-        self.assertEqual(len(keys), 60)  # 50 Cornix + 3 Madula + 7 gesture positions
+        self.assertEqual(len(keys), 64)  # 50 Cornix + 3 Madula + 11 gesture positions
         self.assertEqual(set(encoders), {(0,0),(0,1),(1,0),(1,1)})
         self.assertEqual(vial["matrix"], {"rows": cfg["layout"]["rows"], "cols": cfg["layout"]["cols"]})
         self.assertEqual(int(vial["vendorId"],16), cfg["keyboard"]["vendor_id"])

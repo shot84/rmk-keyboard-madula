@@ -99,14 +99,14 @@
       "shortName": "User17"
     },
     {
-      "name": "User18",
-      "title": "RMK User18",
-      "shortName": "User18"
+      "name": "PAD_3DRAG",
+      "title": "Trackpad: three fingers drag / swipe",
+      "shortName": "Pad\n3F D/S"
     },
     {
-      "name": "User19",
-      "title": "RMK User19",
-      "shortName": "User19"
+      "name": "PAD_FILT",
+      "title": "Trackpad: chip filter 80/40/20/10",
+      "shortName": "Pad\nFilt"
     },
     {
       "name": "User20",
@@ -124,49 +124,49 @@
       "shortName": "Dial button"
     },
     {
-      "name": "User23",
-      "title": "RMK User23",
-      "shortName": "User23"
+      "name": "PAD_SPD_DN",
+      "title": "Trackpad: cursor slower",
+      "shortName": "Pad\nSpd-"
     },
     {
-      "name": "User24",
-      "title": "RMK User24",
-      "shortName": "User24"
+      "name": "PAD_SPD_UP",
+      "title": "Trackpad: cursor faster",
+      "shortName": "Pad\nSpd+"
     },
     {
-      "name": "User25",
-      "title": "RMK User25",
-      "shortName": "User25"
+      "name": "PAD_SCR_DN",
+      "title": "Trackpad: scroll slower",
+      "shortName": "Pad\nScr-"
     },
     {
-      "name": "User26",
-      "title": "RMK User26",
-      "shortName": "User26"
+      "name": "PAD_SCR_UP",
+      "title": "Trackpad: scroll faster",
+      "shortName": "Pad\nScr+"
     },
     {
-      "name": "User27",
-      "title": "RMK User27",
-      "shortName": "User27"
+      "name": "PAD_TAP_DN",
+      "title": "Trackpad: shorter tap time",
+      "shortName": "Pad\nTap-"
     },
     {
-      "name": "User28",
-      "title": "RMK User28",
-      "shortName": "User28"
+      "name": "PAD_TAP_UP",
+      "title": "Trackpad: longer tap time",
+      "shortName": "Pad\nTap+"
     },
     {
-      "name": "User29",
-      "title": "RMK User29",
-      "shortName": "User29"
+      "name": "PAD_RESET",
+      "title": "Trackpad: reset tuning",
+      "shortName": "Pad\nReset"
     },
     {
-      "name": "User30",
-      "title": "RMK User30",
-      "shortName": "User30"
+      "name": "PAD_DRAG",
+      "title": "Trackpad: tap-drag on/off",
+      "shortName": "Pad\nDrag"
     },
     {
-      "name": "User31",
-      "title": "RMK User31",
-      "shortName": "User31"
+      "name": "PAD_LIFT",
+      "title": "Trackpad: lift hold off/3/5 frames",
+      "shortName": "Pad\nLift"
     }
   ],
   "layouts": {
@@ -558,6 +558,16 @@
         "4,7",
         "4,8",
         "4,9"
+      ],
+      [
+        {
+          "x": 2,
+          "y": 0.3
+        },
+        "4,10",
+        "4,11",
+        "4,12",
+        "4,13"
       ]
     ]
   }
