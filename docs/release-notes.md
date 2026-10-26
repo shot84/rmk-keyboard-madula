@@ -1,3 +1,18 @@
+# Cornix + Madula — RMK firmware, review build by shot84 (not official)
+
+Based on te9no/rmk-keyboard-madula v0.1.0-rc.7 (`b00a275`), branch `review-rc7`.
+The BLE, Dial and touchpad improvements are in rc.7 itself; this build only adds:
+
+- My own 8-layer keymap (tap-hold profiles, left wheel reversed, three-finger swipes for macOS).
+- Touchpad vertical scroll in the ZMK driver's direction (natural on macOS, the opposite way on Windows).
+
+Tested on hardware with the touchpad build (`madula-iqs`) only; the LPPS and trackball builds are built but untested.
+CI-built UF2 checksums are listed in SHA256SUMS and are not the same files as the ones tested locally.
+
+Below: te9no's original rc.7 release notes, unchanged.
+
+---
+
 # v0.1.0-rc.7 — Dial再接続・BLE入力・IQSジェスチャー改善
 
 shot84さんの修正を機能単位で取り込みました。
