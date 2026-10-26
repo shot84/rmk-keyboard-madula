@@ -38,6 +38,7 @@ battery-audit = []
 led-self-test = []
 
 [patch.crates-io]
+rmk-types = { path = "vendor/rmk-types" }
 rmk-macro = { path = "vendor/rmk-macro" }
 rmk = { path = "vendor/rmk" }
 embassy-usb-logger = { path = "vendor/embassy-usb-logger" }

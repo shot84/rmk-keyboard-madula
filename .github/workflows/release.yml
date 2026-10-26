@@ -8,6 +8,16 @@ permissions:
   contents: read
 
 jobs:
+  protocol-compatibility:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install host toolchain
+        run: rustup toolchain install 1.94.1 --profile minimal
+      - name: Wire snapshots and macro compatibility
+        run: |
+          cargo +1.94.1 test --locked --manifest-path vendor/rmk-types/Cargo.toml --target x86_64-unknown-linux-gnu --features host
+          cargo +1.94.1 test --locked --manifest-path tests/rynk-compat/Cargo.toml --target x86_64-unknown-linux-gnu
   build:
     runs-on: ubuntu-24.04
     strategy:
@@ -50,7 +60,7 @@ jobs:
           if-no-files-found: error
   draft-release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [build, protocol-compatibility]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -62,7 +72,7 @@ jobs:
           path: dist
           merge-multiple: true
       - name: Include editor definitions and setup guides
-        run: cp madula-vial.json vial.json docs/rynk.md docs/vial-web.md dist/
+        run: cp madula-vial.json vial.json rynk-compat.json docs/rynk.md docs/vial-web.md dist/
       - name: Checksums
         working-directory: dist
         run: sha256sum *.uf2 *.elf *.json *.md > SHA256SUMS

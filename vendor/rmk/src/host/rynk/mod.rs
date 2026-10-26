@@ -7,6 +7,8 @@
 mod handlers;
 mod topics;
 
+mod legacy_macros;
+
 use embassy_futures::select::{Either, select};
 use embedded_io_async::{Read, Write};
 use postcard::experimental::max_size::MaxSize;

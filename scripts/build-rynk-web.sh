@@ -2,7 +2,7 @@
 # Build upstream's reference WebHID tool at the firmware protocol revision.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-revision=a917b60a1f5d4fac50eca474635c774b13a13ebb
+revision=933b0630a23393961e5b3bfa7a176a68d9bb8b8c
 checkout="$PWD/target/rynk-web-source"
 command -v wasm-pack >/dev/null || { echo 'Install wasm-pack first: cargo install wasm-pack --locked' >&2; exit 2; }
 rustup target add wasm32-unknown-unknown --toolchain 1.94.1

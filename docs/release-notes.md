@@ -1,66 +1,17 @@
-# v0.1.0-rc.5 — Madula Vial / Rynk
+# v0.1.0-rc.6 — Fix RMK GUI protocol mismatch
 
-Adds browser keymap editing builds for Madula LPPS, TB (PMW3610), and IQS9151.
+Fixes “firmware speaks v0.1, this tool speaks v0.2” when connecting the Rynk variants to https://gui.rmk.rs.
 
-- `madula-{lpps,tb,iqs}.uf2`: Vial variants.
-- `madula-{lpps,tb,iqs}-rynk.uf2`: experimental Rynk variants; use BLE/WebHID for the reference browser client.
-- Choose the image matching your installed module and desired protocol. Vial and Rynk cannot be enabled together.
-- Cornix left/right peripheral images are included. CornixTP has its own central image.
+- Flash `madula-lpps-rynk.uf2`, `madula-tb-rynk.uf2`, or `madula-iqs-rynk.uf2`, matching your installed input module.
+- Backports the exact Rynk v0.2 wire types used by RMK GUI (RMK revision `933b0630a23393961e5b3bfa7a176a68d9bb8b8c`), including capabilities and whole-macro requests.
+- Retains the existing storage schema, keymap, pairing format, LEDs, and Dial support. Existing RMK peripheral firmware can remain installed.
+- Macro conversion supports ordinary HID Tap/Press/Release, ASCII characters, and Delay up to 65024 ms. Up to 32 operations per macro and 32 slots, within the existing shared buffer. Unsupported extended actions/PauseForRelease and overflow are rejected without overwriting macros. Existing extended or longer Vial macros must be edited with Vial.
+- Files without the `-rynk` suffix are Vial builds.
 
-Rynk firmware builds are verified. Device flashing, browser editing, persistence after reboot, and the reference Web client build remain unverified for Madula Rynk. The Web client must be built locally at the pinned revision; this release does not host a Web editor.
+Validation: deployed GUI WASM handshake, capabilities, identity, key and macro read/write, invalid-write preservation, BLE status decoding; protocol snapshots and adapter tests; firmware CI builds. The wire test uses a host test peer, not physical hardware. USB/BLE hardware operation and persistence after reboot remain unverified for this fix.
 
-See [Rynk setup](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.5/docs/rynk.md) and [Vial Web setup](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.5/docs/vial-web.md). Setup documents and Vial definitions are included as release assets.
+[Connection instructions](https://github.com/te9no/rmk-keyboard-madula/blob/v0.1.0-rc.6/docs/rynk.md)
 
-# Cornix + Madula — RMK experimental firmware
+RMK GUI supports browser USB through WebUSB; the previous BLE-only guidance applied to upstream's reference demo. Rynk is experimental: other commits may use different formats even when labeled v0.2.
 
-## v0.1.0-rc.4
-
-- Cornix dual LEDs: layer/Caps Lock colors, Central connection indication,
-  300ms fade-in and 600ms fade-out, using PWM + EasyDMA.
-- Left encoder scrolls; right encoder provides Windows Radial Controller
-  rotation and press, over USB or BLE. Long-press opens the Dial menu.
-- Stable storage compatibility ID prevents ordinary rebuilds from resetting
-  pairing data. Re-pair once if an older build already lost its keys.
-- USB/BLE Dial, LED colors and the storage fix have user hardware acceptance.
-  This is still a prerelease, not exhaustive hardware certification.
-- No BLE-forced diagnostic routing or LED startup self-test in release builds.
-
-Download the UF2 matching your hardware:
-
-| File | Target |
-| --- | --- |
-| `cornix-left.uf2` | Cornix left peripheral |
-| `cornix-right.uf2` | Cornix right peripheral |
-| `madula-lpps.uf2` | Madula central with LPPS |
-| `madula-tb.uf2` | Madula central with PMW3610 trackball |
-| `madula-iqs.uf2` | Madula central with IQS9151 touchpad |
-
-Use all three boards with RMK. ZMK peripherals are not compatible.
-Turn power off before exchanging Madula modules.
-IQS provides half-speed pointer motion, one/two/three-finger taps for
-left/right/middle click, and two-finger vertical/horizontal scrolling.
-IQS basic operation has been user-confirmed; exhaustive gesture and long-duration
-testing remain incomplete. Pinch, tap-drag and inertia are not implemented.
-The Madula builds include the NiMH single-cell battery voltage estimate for
-the verified 1MΩ/470kΩ Bat divider and status LEDs.
-
-**Migration warning:** These images start at 0x1000 and overwrite the legacy
-SoftDevice on XIAO. They are not ordinary ZMK firmware updates. Returning to
-ZMK may require restoring the SoftDevice. Back up your device and check the
-repository's bootloader/migration instructions before flashing. Do not use on
-other boards. Existing settings and pairing may be affected.
-
-Basic operation was tested on the author's hardware; long-duration testing,
-all gestures and all battery conditions are not certified. Battery percentage
-is a voltage-derived estimate. This is an experimental prerelease.
-
-ELF files are for debugging. Per-variant JSON records the source commit and
-hashes; `SHA256SUMS` verifies all payloads. Device backups are never included.
-
-## CornixTP experimental target
-
-`cornix-tp.uf2` targets the XIAO nRF52840 + TPS43 central; use it with the two Cornix peripheral images. Hardware validation is pending. See [CornixTP notes](cornix-tp.md). Do not use the Madula image on this wiring.
-
-CornixTP now includes Vial for keys, encoders and gesture bindings. USB/BLE transport integration and embedded layout are build-verified; device recognition and persistent editing still require hardware validation.
-
-Madula Rynk variants are available as madula-{lpps,tb,iqs}-rynk.uf2. These are experimental alternatives to Vial, with no hardware validation yet. See [Rynk setup](rynk.md).
+UF2 images are RMK SDC applications at 0x1000 and overwrite legacy SoftDevice; they are not ZMK application updates. ELF files are for debugging. JSON manifests record source and hashes. SHA256SUMS covers release payloads. Device backups are never included.

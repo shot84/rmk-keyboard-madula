@@ -13,6 +13,7 @@ root = pathlib.Path("dist")
 madula_vial = "madula-vial" in features
 definition = "madula-vial.json" if madula_vial else "vial.json"
 vial_enabled = variant == "cornix-tp" or madula_vial
+rynk = json.loads(pathlib.Path("rynk-compat.json").read_text()) if "madula-rynk" in features else None
 data = {
     "variant": variant,
     "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
@@ -23,6 +24,8 @@ data = {
     "keyboard_config": "cornix-tp.toml" if variant == "cornix-tp" else "keyboard.toml",
     "host_override": "madula-rynk" if "madula-rynk" in features else "madula-vial" if madula_vial else None,
     "host_protocol": "rynk" if "madula-rynk" in features else "vial" if vial_enabled else None,
+    "rynk_protocol_version": rynk["protocol_version"] if rynk else None,
+    "rynk_wire_revision": rynk["wire_revision"] if rynk else None,
     "rmk_types_version": "0.4.0",
     "rust": subprocess.check_output(["rustc", "+" + os.getenv("RELEASE_TOOLCHAIN", "1.94.1"), "--version"], text=True).strip(),
     "application_base": "0x1000",

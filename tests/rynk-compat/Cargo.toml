@@ -1,0 +1,16 @@
+[package]
+name = "madula-rynk-compat-tests"
+version = "0.1.0"
+edition = "2024"
+publish = false
+[dependencies]
+rmk-types = { path = "../../vendor/rmk-types", features = ["host"] }
+heapless = "0.9"
+postcard = { version = "1", features = ["use-std"] }
+cobs = { version = "0.3", features = ["alloc"] }
+serde = "1"
+[[bin]]
+name = "wire-peer"
+path = "wire_peer.rs"
+[lib]
+path = "lib.rs"

@@ -32,7 +32,7 @@ CornixTP用の独立した中央機ターゲットを追加しました。Vial�
 ## Rynk（実験版）
 
 Madula向けにRynk版も追加しました。[ビルドとWebツールの手順](docs/rynk.md)を参照してください。
-Vial版とは別のUF2で、ブラウザー接続はBLE経由です。実機検証は未実施です。
+Vial版とは別のUF2で、[RMK GUI](https://gui.rmk.rs)のRynk v0.2に対応します。USB/WebUSBとBLEに対応する通信形式を検証済みです。修正版の実機検証は未実施です。
 
 ## 入力モジュール
 
