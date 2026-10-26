@@ -99,14 +99,14 @@
       "shortName": "User\n17"
     },
     {
-      "name": "USER18",
-      "title": "User 18 (unused)",
-      "shortName": "User\n18"
+      "name": "PAD_3DRAG",
+      "title": "Trackpad: three fingers drag / swipe",
+      "shortName": "Pad\n3F D/S"
     },
     {
-      "name": "USER19",
-      "title": "User 19 (unused)",
-      "shortName": "User\n19"
+      "name": "PAD_FILT",
+      "title": "Trackpad: chip filter 80/40/20/10",
+      "shortName": "Pad\nFilt"
     },
     {
       "name": "DIAL_CW",
@@ -122,6 +122,51 @@
       "name": "DIAL_BTN",
       "title": "Dial: press",
       "shortName": "Dial\nPress"
+    },
+    {
+      "name": "PAD_SPD_DN",
+      "title": "Trackpad: cursor slower",
+      "shortName": "Pad\nSpd-"
+    },
+    {
+      "name": "PAD_SPD_UP",
+      "title": "Trackpad: cursor faster",
+      "shortName": "Pad\nSpd+"
+    },
+    {
+      "name": "PAD_SCR_DN",
+      "title": "Trackpad: scroll slower",
+      "shortName": "Pad\nScr-"
+    },
+    {
+      "name": "PAD_SCR_UP",
+      "title": "Trackpad: scroll faster",
+      "shortName": "Pad\nScr+"
+    },
+    {
+      "name": "PAD_TAP_DN",
+      "title": "Trackpad: shorter tap time",
+      "shortName": "Pad\nTap-"
+    },
+    {
+      "name": "PAD_TAP_UP",
+      "title": "Trackpad: longer tap time",
+      "shortName": "Pad\nTap+"
+    },
+    {
+      "name": "PAD_RESET",
+      "title": "Trackpad: reset tuning",
+      "shortName": "Pad\nReset"
+    },
+    {
+      "name": "PAD_DRAG",
+      "title": "Trackpad: tap-drag on/off",
+      "shortName": "Pad\nDrag"
+    },
+    {
+      "name": "PAD_LIFT",
+      "title": "Trackpad: lift hold off/3/5 frames",
+      "shortName": "Pad\nLift"
     }
   ],
   "layouts": {
@@ -222,7 +267,11 @@
         "4,6",
         "4,7",
         "4,8",
-        "4,9"
+        "4,9",
+        "4,10",
+        "4,11",
+        "4,12",
+        "4,13"
       ]
     ]
   }

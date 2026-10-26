@@ -8,6 +8,11 @@ use rmk::event::{ConnectionStatusChangeEvent, ConnectionType, EventSubscriber,
 #[path = "ws2812_pwm.rs"]
 mod driver;
 
+// Pulse count requested by other tasks (pad tuning keys); the LED loop picks it up.
+static PULSES: core::sync::atomic::AtomicU8 = core::sync::atomic::AtomicU8::new(0);
+#[allow(dead_code)] // Only the IQS build calls it.
+pub fn pulse(count: u8) { PULSES.store(count, core::sync::atomic::Ordering::Relaxed); }
+
 fn layer_rgb(layer: u8) -> [u8; 3] {
     match layer {
         0 => [0, 0, 32], 1 => [32, 0, 0], 2 => [0, 32, 0],
@@ -43,6 +48,7 @@ pub async fn run(mut pwm: SequencePwm<'static>, mut power: Output<'static>,
     let mut last_rgb = [255; 3];
     let mut powered = false;
     let mut last_lit = 0;
+    let (mut pulses, mut pulse_start) = (0u8, 0u64);
     loop {
         match select3(connections.next_event(), layers.next_event(), Timer::after_millis(10)).await {
             Either3::First(event) => {
@@ -62,6 +68,9 @@ pub async fn run(mut pwm: SequencePwm<'static>, mut power: Output<'static>,
             Either3::Third(_) => {}
         }
         let now = Instant::now().as_millis();
+        let requested = PULSES.swap(0, core::sync::atomic::Ordering::Relaxed);
+        if requested != 0 { pulses = requested; pulse_start = now; }
+        let pulse_elapsed = now.saturating_sub(pulse_start);
         let elapsed = now.saturating_sub(layer_start);
         let onboard = if now < status_until { status }
             else if layer_start != 0 && elapsed < 120 { layer_rgb(layer) }
@@ -73,7 +82,10 @@ pub async fn run(mut pwm: SequencePwm<'static>, mut power: Output<'static>,
         let battery_rgb = crate::battery_audit::led_rgb(now);
         #[cfg(not(feature = "battery-audit"))]
         let battery_rgb = [0; 3];
-        let rgb = if now < status_until { status }
+        let rgb = if pulse_elapsed < u64::from(pulses)*240 {
+                if (pulse_elapsed/120)%2 == 0 { [32, 16, 0] } else { [0; 3] }
+            }
+            else if now < status_until { status }
             else if elapsed < u64::from(layer)*240 {
                 if (elapsed/120)%2 == 0 { [32; 3] } else { [0; 3] }
             }

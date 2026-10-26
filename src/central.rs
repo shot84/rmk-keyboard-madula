@@ -13,6 +13,8 @@ mod pmw3610;
 mod iqs9151;
 #[cfg(feature = "iqs9151")]
 mod iqs9151_config;
+#[cfg(feature = "iqs9151")]
+mod iqs9151_tune;
 #[cfg(all(feature = "iqs9151", any(feature = "lpps", feature = "pmw3610")))]
 compile_error!("Select only one Madula input module");
 #[cfg(feature = "battery-audit")]

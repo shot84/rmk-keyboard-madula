@@ -16,7 +16,7 @@ map = """
 (2,0) (2,1) (2,2) (2,3) (2,4) (2,5) (2,6) (1,13) (2,12) (2,11) (2,10) (2,9) (2,8) (2,7)
 (3,0) (3,1) (3,2) (3,3) (3,4) (3,5)             (3,12) (3,11) (3,10) (3,9) (3,8) (3,7)
 (4,0) (4,1) (4,2)
-(4,3) (4,4) (4,5) (4,6) (4,7) (4,8) (4,9)
+(4,3) (4,4) (4,5) (4,6) (4,7) (4,8) (4,9) (4,10) (4,11) (4,12) (4,13)
 """
 
 [keymap]
@@ -31,7 +31,7 @@ Tab A S D F G H J K L Minus Enter
 LShift Z X C V B No User22 N M Comma Dot Up LT(7, Slash, lt)
 LCtrl LAlt LShift MT(Language2, LGui, mt) LT(4, Space, lt) LT(6, Language1, lt) Backspace LT(5, Enter, lt) TD(0) Left Down Right
 MouseBtn1 MouseBtn3 MouseBtn2
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
@@ -42,7 +42,7 @@ No No No No Semicolon Minus Equal Quote No No No No
 No No No No No No No User22 No No No No No No
 No No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
@@ -53,7 +53,7 @@ User0 No No No No No No No No No No No
 User1 No No No No No No User22 No No No No No No
 User2 No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
@@ -64,7 +64,7 @@ User0 No No No No No No No No No No No
 User1 No No No No No No User22 No No No No No No
 User2 No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
@@ -75,7 +75,7 @@ No Tab WM(Quote, LShift) WM(Kc7, LShift) WM(Kc9, LShift) WM(Kc0, LShift) LeftBra
 No WM(Kc3, LShift) WM(Equal, LShift) WM(Kc1, LShift) WM(Slash, LShift) WM(Grave, LShift) No User22 WM(A, LGui) WM(C, LGui) WM(V, LGui) WM(Q, LCtrl) WM(Equal, LShift | LGui) No
 No LCtrl WM(Kc2, LShift) Equal No No Delete No No No WM(Minus, LGui) No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
@@ -86,7 +86,7 @@ No Kc0 Kc4 Kc5 Kc6 WM(Semicolon, LShift) WM(RightBracket, LGui) No Up No No No
 LShift MT(Slash, LShift, mt) Kc1 Kc2 Kc3 Backslash No User22 WM(LeftBracket, LGui) Left Down Right No No
 No LCtrl LAlt _ WM(R, LCtrl | LGui) WM(S, LCtrl | LShift) No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
@@ -94,10 +94,10 @@ encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
 keys = """
 No No No No No F4 No No No No No No
 No No No No No Semicolon WM(LeftBracket, LShift) WM(RightBracket, LShift) No No No No
-No No No No No No No User22 WM(Comma, LShift) WM(Dot, LShift) WM(D, LShift | LGui) WM(Kc4, LShift | LGui) WM(Kc5, LShift | LGui) No
+No No No No No No User18 User22 WM(Comma, LShift) WM(Dot, LShift) WM(D, LShift | LGui) WM(Kc4, LShift | LGui) WM(Kc5, LShift | LGui) No
 No No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
@@ -108,7 +108,7 @@ No No No No WM(F1, LShift | LAlt) WM(S, LShift | LAlt) No No No No No No
 No No No No No No No User22 No No No No No No
 No No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [behavior.morse]
