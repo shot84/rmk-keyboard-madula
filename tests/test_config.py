@@ -6,6 +6,11 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
+def keys(text):
+    # Keys are separated by spaces outside parentheses
+    return re.findall(r"[^\s(]+(?:\([^)]*\))?", text)
+
+
 class BringupConfig(unittest.TestCase):
     def setUp(self):
         self.cfg = tomllib.loads((ROOT / "keyboard.toml").read_text())
@@ -40,17 +45,20 @@ class BringupConfig(unittest.TestCase):
         self.assertTrue(direct["direct_pin_low_active"])
 
     def test_keymap_count(self):
-        self.assertEqual(self.cfg["keymap"]["layers"], 5)
-        self.assertEqual(len(self.cfg["keymap"]["layer"]), 5)
+        # This branch carries my own 8-layer keymap
+        self.assertEqual(self.cfg["keymap"]["layers"], 8)
+        self.assertEqual(len(self.cfg["keymap"]["layer"]), 8)
         for layer in self.cfg["keymap"]["layer"]:
-            self.assertEqual(len(layer["keys"].split()), 64)
-            self.assertEqual(layer["keys"].split()[-11:-4], [
+            self.assertEqual(len(keys(layer["keys"])), 64)
+            self.assertEqual(keys(layer["keys"])[-11:-4], [
                 "MouseBtn1", "MouseBtn2", "MouseBtn3", "MouseWheelUp",
                 "MouseWheelDown", "MouseWheelLeft", "MouseWheelRight"])
 
-    def test_swipes_start_unassigned(self):
+    def test_swipes_follow_macos(self):
+        # Swiping left shows the Space to the right, as on the macOS trackpad
         for layer in self.cfg["keymap"]["layer"]:
-            self.assertEqual(layer["keys"].split()[-4:], ["No"] * 4)
+            self.assertEqual(keys(layer["keys"])[-4:], [
+                "WM(Up, LCtrl)", "WM(Down, LCtrl)", "WM(Right, LCtrl)", "WM(Left, LCtrl)"])
 
     def test_ble_device_name_length(self):
         # RMK 0.9's BLE profile naming reserves space: max 22 UTF-8 bytes.
@@ -67,9 +75,10 @@ class BringupConfig(unittest.TestCase):
             self.assertNotIn(encoder["pin_a"], matrix_pins)
             self.assertNotIn(encoder["pin_b"], matrix_pins)
         for layer in self.cfg["keymap"]["layer"]:
-            self.assertEqual(layer["encoders"], [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]])
+            # Left wheel reversed in my keymap (clockwise scrolls down)
+            self.assertEqual(layer["encoders"], [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]])
             # Right encoder push: global matrix (1,13), keymap position 31.
-            self.assertEqual(layer["keys"].split()[31], "User22")
+            self.assertEqual(keys(layer["keys"])[31], "User22")
 
     def test_split_sleep_subscriber_capacity(self):
         # Pinned RMK 0.9 adds two split+BLE subscribers to the configured base.
@@ -83,10 +92,7 @@ class BringupConfig(unittest.TestCase):
         self.assertGreaterEqual(self.cfg["event"]["connection_status_change"]["subs"] + 2, 4)
 
     def test_madula_tap_hold_and_buttons(self):
-        layers = [layer["keys"].split() for layer in self.cfg["keymap"]["layer"]]
-        self.assertEqual(layers[0][12], "LT(3,Escape)")
-        self.assertEqual(layers[0][38:44], [
-            "MT(Escape,LCtrl)", "LGui", "LAlt", "LT(1,Space)", "LT(2,Space)", "Backspace"])
+        layers = [keys(layer["keys"]) for layer in self.cfg["keymap"]["layer"]]
         self.assertEqual(layers[0][50:53], ["MouseBtn1", "MouseBtn3", "MouseBtn2"])
         for layer in layers[1:]:
             self.assertEqual(layer[50:53], ["_", "_", "_"])

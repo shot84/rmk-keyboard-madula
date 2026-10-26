@@ -20,69 +20,114 @@ map = """
 """
 
 [keymap]
-layers = 5
-# Source: te9no/zmk-keyboard-cornix config/madula.keymap @ 1ca9112
-# Layer order: base, func, num, bt, navi.
-# Row 4 columns 3..9 are taps/scroll; 10..13 are unassigned IQS swipes (up/down/left/right).
+layers = 8
+# Ported from Cornix LP Vial backup (cornix_lp_v1.10_before.vil) by tools/vil2rmk.py (feel=mekabu)
+# Row 4 columns 3..9 are taps/scroll; 10..13 are IQS swipes (up/down/left/right).
 
 [[keymap.layer]]
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
 keys = """
-Tab Q W E R T                    Y U I O P Backspace
-LT(3,Escape) A S D F G            H J K L Backslash Enter
-LShift Z X C V B No User22      N M Comma Dot Up Slash
-MT(Escape,LCtrl) LGui LAlt LT(1,Space) LT(2,Space) Backspace Language1 Language2 No Left Down Right
+Escape Q W E R T Y U I O P Backspace
+Tab A S D F G H J K L Minus Enter
+LShift Z X C V B No User22 N M Comma Dot Up LT(7, Slash, lt)
+LCtrl LAlt LShift MT(Language2, LGui, mt) LT(4, Space, lt) LT(6, Language1, lt) Backspace LT(5, Enter, lt) TD(0) Left Down Right
 MouseBtn1 MouseBtn3 MouseBtn2
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
 keys = """
-_ PageUp Up PageDown _ _         F1 F2 F3 F4 F5 _
-_ Left Down Right _ _            F6 F7 F8 F9 F10 _
-_ Backspace Delete Home End _ _ User22 F11 F12 Semicolon Quote _ _
-No No No _ _ Backspace           _ _ _ No No No
+Escape Kc1 Kc2 Kc3 Kc4 Kc5 Kc6 Kc7 Kc8 Kc9 Kc0 Delete
+No No No No Semicolon Minus Equal Quote No No No No
+No No No No No No No User22 No No No No No No
+No No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
-# BT clear and LayoutShift are intentionally inactive until ported.
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
 keys = """
-No Kc1 Kc2 Kc3 Kc4 Kc5           Kc6 Kc7 Kc8 Kc9 Kc0 _
-No _ _ _ _ _                    Minus Equal LeftBracket RightBracket Backslash _
-_ Backspace Delete _ _ _ _ User22 _ Slash Semicolon Quote _ _
-No No No Enter No No            No No _ No No No
+No No No No No No No No No No No No
+User0 No No No No No No No No No No No
+User1 No No No No No No User22 No No No No No No
+User2 No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
-# ZMK BT_SEL / BT_CLR_ALL are not mapped to RMK host profiles yet.
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
 keys = """
-No No No No _ _                 _ _ _ _ _ _
-No _ _ _ _ _                    _ _ _ _ _ _
-No No No No No _ No User22     _ _ _ _ _ _
-No No No _ _ _                  No No _ No No No
+No No No No No No No No No No No No
+User0 No No No No No No No No No No No
+User1 No No No No No No User22 No No No No No No
+User2 No No No No No No No No No No No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
 
 [[keymap.layer]]
-# Preserve source navi layout; source MO(7) targets a nonexistent layer.
-encoders = [["MouseWheelUp", "MouseWheelDown"], ["User20", "User21"]]
-# Mouse directions preserved, speed is RMK's rather than ZMK's numeric values.
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
 keys = """
-No No No MouseUp PageUp PageDown MouseBtn1 MouseBtn3 MouseBtn2 MouseWheelUp MouseWheelDown No
-No No MouseLeft MouseDown MouseRight MouseWheelUp Left Down Up Right No No
-No No No No No MouseWheelDown _ User22 _ _ No No No No
-No No No No _ _                 No No Kc5 No No No
+_ Escape F2 WM(Left, LCtrl | LAlt) WM(Right, LCtrl | LAlt) WM(Backslash, LShift) WM(D, LCtrl | LAlt) WM(E, LCtrl | LAlt) WM(F, LCtrl | LAlt) WM(T, LCtrl | LAlt) WM(G, LCtrl | LAlt) No
+No Tab WM(Quote, LShift) WM(Kc7, LShift) WM(Kc9, LShift) WM(Kc0, LShift) LeftBracket RightBracket Quote WM(Down, LShift | LGui) WM(Enter, LCtrl | LAlt) No
+No WM(Kc3, LShift) WM(Equal, LShift) WM(Kc1, LShift) WM(Slash, LShift) WM(Grave, LShift) No User22 WM(A, LGui) WM(C, LGui) WM(V, LGui) WM(Q, LCtrl) WM(Equal, LShift | LGui) No
+No LCtrl WM(Kc2, LShift) Equal No No Delete No No No WM(Minus, LGui) No
 _ _ _
-MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight No No No No
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
 """
+
+[[keymap.layer]]
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
+keys = """
+No Tab Kc7 Kc8 Kc9 Minus WM(Left, LCtrl) WM(Right, LCtrl) WM(Up, LCtrl) WM(Down, LCtrl) No No
+No Kc0 Kc4 Kc5 Kc6 WM(Semicolon, LShift) WM(RightBracket, LGui) No Up No No No
+LShift MT(Slash, LShift, mt) Kc1 Kc2 Kc3 Backslash No User22 WM(LeftBracket, LGui) Left Down Right No No
+No LCtrl LAlt _ WM(R, LCtrl | LGui) WM(S, LCtrl | LShift) No No No No No No
+_ _ _
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
+"""
+
+[[keymap.layer]]
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
+keys = """
+No No No No No F4 No No No No No No
+No No No No No Semicolon WM(LeftBracket, LShift) WM(RightBracket, LShift) No No No No
+No No No No No No User18 User22 WM(Comma, LShift) WM(Dot, LShift) WM(D, LShift | LGui) WM(Kc4, LShift | LGui) WM(Kc5, LShift | LGui) No
+No No No No No No No No No No No No
+_ _ _
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
+"""
+
+[[keymap.layer]]
+encoders = [["MouseWheelDown", "MouseWheelUp"], ["User20", "User21"]]
+keys = """
+No No No No WM(Minus, LAlt | LGui) WM(KpEqual, LShift | LAlt | LGui) No No No No No No
+No No No No WM(F1, LShift | LAlt) WM(S, LShift | LAlt) No No No No No No
+No No No No No No No User22 No No No No No No
+No No No No No No No No No No No No
+_ _ _
+MouseBtn1 MouseBtn2 MouseBtn3 MouseWheelUp MouseWheelDown MouseWheelLeft MouseWheelRight WM(Up, LCtrl) WM(Down, LCtrl) WM(Right, LCtrl) WM(Left, LCtrl)
+"""
+
+[behavior.morse]
+prior_idle_time = "150ms"
+[behavior.morse.profiles.lt]
+permissive_hold = true
+hold_timeout = "200ms"
+[behavior.morse.profiles.mt]
+permissive_hold = true
+hold_timeout = "280ms"
+quick_tap_timeout = "175ms"
+enable_flow_tap = true
+[behavior.morse.profiles.t150]
+hold_timeout = "150ms"
+[[behavior.morse.morses]]
+profile = "t150"
+hold = "MO(2)"
+double_tap = "WM(Space, LGui)"
 
 [storage]
 start_addr = 0xE0000
